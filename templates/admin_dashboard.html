@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — GMT_Learning</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1B4332; --gold:#D4A017; --gold-light:#E8C158; --cream:#FAF6ED; --paper:#F1EAD9;
+    --ink:#2D2A26; --ink-soft:#5C5650; --stamp:#A8443A; --ok:#2D6A4F; --line:#DDD3B8; --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--ink);line-height:1.5;}
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+  input,select,textarea{font-family:inherit;}
+  a{color:inherit;text-decoration:none;}
+
+  .topbar{
+    background:var(--forest);color:var(--cream);padding:14px 24px;
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  }
+  .topbar .left{display:flex;align-items:center;gap:12px;}
+  .topbar .badge{
+    width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.12);
+    display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;
+    font-weight:700;font-size:0.7rem;border:2px solid var(--gold);
+  }
+  .topbar h1{font-size:1.1rem;}
+  .topbar nav{display:flex;gap:16px;}
+  .topbar nav a{font-size:0.85rem;font-weight:600;opacity:0.85;padding:6px 0;}
+  .topbar nav a.active{opacity:1;border-bottom:2px solid var(--gold);}
+  .logout{font-size:0.8rem;font-weight:600;opacity:0.8;}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 24px 60px;}
+
+  .panel{
+    background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);
+    padding:24px;margin-bottom:24px;
+  }
+  .panel h2{font-size:1.1rem;color:var(--forest);margin-bottom:4px;}
+  .panel .panel-sub{font-size:0.82rem;color:var(--ink-soft);margin-bottom:18px;}
+
+  /* Upload form */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:700px){.form-grid{grid-template-columns:1fr;}}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field.full{grid-column:1 / -1;}
+  .field label{font-size:0.8rem;font-weight:600;}
+  .field input, .field select, .field textarea{
+    border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;
+    background:var(--paper);font-size:0.9rem;outline:none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{border-color:var(--gold);}
+  .field textarea{resize:vertical;min-height:60px;}
+
+  .file-drop{
+    border:2px dashed var(--line);border-radius:10px;padding:22px;text-align:center;
+    background:var(--paper);cursor:pointer;transition:border-color .15s;
+  }
+  .file-drop.dragover{border-color:var(--gold);}
+  .file-drop .fname{font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--forest);font-weight:600;margin-top:6px;}
+  .file-drop p{font-size:0.85rem;color:var(--ink-soft);}
+
+  .submit-row{grid-column:1 / -1;display:flex;align-items:center;gap:14px;margin-top:6px;}
+  .btn-primary{
+    background:var(--forest);color:var(--cream);padding:12px 24px;border-radius:9px;
+    font-weight:600;font-size:0.9rem;box-shadow:0 4px 0 #102b1f;
+  }
+  .btn-primary:active{transform:translateY(2px);box-shadow:0 1px 0 #102b1f;}
+  .btn-primary:disabled{opacity:0.6;cursor:not-allowed;}
+  .form-msg{font-size:0.85rem;font-weight:600;}
+  .form-msg.error{color:var(--stamp);}
+  .form-msg.success{color:var(--ok);}
+
+  /* Resource table */
+  table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+  thead th{
+    text-align:left;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;
+    color:var(--ink-soft);padding:8px 10px;border-bottom:2px solid var(--line);
+  }
+  tbody td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  tbody tr:hover{background:var(--paper);}
+  .tag{
+    font-family:'JetBrains Mono',monospace;font-size:0.62rem;font-weight:700;text-transform:uppercase;
+    background:var(--forest);color:var(--cream);padding:3px 8px;border-radius:5px;
+  }
+  .status-pill{
+    font-size:0.7rem;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-block;
+  }
+  .status-pill.active{background:#DCEDE2;color:var(--ok);}
+  .status-pill.inactive{background:#F1E0DD;color:var(--stamp);}
+  .row-actions{display:flex;gap:8px;}
+  .icon-action{
+    width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+    border:1.5px solid var(--line);transition:background .15s;
+  }
+  .icon-action:hover{background:var(--paper);}
+  .icon-action.danger:hover{background:#F1E0DD;border-color:var(--stamp);color:var(--stamp);}
+  .price-cell{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--stamp);}
+
+  .empty-state{text-align:center;padding:30px;color:var(--ink-soft);font-size:0.88rem;}
+  .loading-row{text-align:center;padding:20px;color:var(--ink-soft);font-size:0.85rem;}
+
+  /* Edit modal */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(27,30,26,0.55);display:none;
+    align-items:center;justify-content:center;padding:20px;z-index:100;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--cream);border-radius:var(--radius);max-width:480px;width:100%;
+    padding:24px;max-height:90vh;overflow-y:auto;}
+  .modal h3{font-size:1.05rem;color:var(--forest);margin-bottom:16px;}
+  .modal .field{margin-bottom:14px;}
+  .modal-actions{display:flex;gap:10px;margin-top:18px;}
+  .btn-secondary{
+    flex:1;border:1.5px solid var(--line);color:var(--ink-soft);padding:11px;border-radius:9px;
+    font-weight:600;font-size:0.85rem;
+  }
+  .modal-actions .btn-primary{flex:1;}
+
+  table-wrap{overflow-x:auto;display:block;}
+  .table-scroll{overflow-x:auto;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="left">
+    <div class="badge">GM</div>
+    <h1>GMT_Learning Admin</h1>
+  </div>
+  <nav>
+    <a href="/admin" class="active">Resources</a>
+    <a href="/admin/orders">Orders</a>
+  </nav>
+  <a href="/admin/logout" class="logout">Log out</a>
+</div>
+
+<div class="wrap">
+
+  <!-- Upload panel -->
+  <div class="panel">
+    <h2>Upload a new resource</h2>
+    <p class="panel-sub">PDF only, up to 25MB. Page count is detected automatically.</p>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+      <div class="form-grid">
+
+        <div class="field full">
+          <label for="fileInput">PDF file</label>
+          <div class="file-drop" id="fileDrop">
+            <p>Click to choose a file, or drag a PDF here</p>
+            <div class="fname" id="fname"></div>
+          </div>
+          <input type="file" id="fileInput" name="file" accept="application/pdf" style="display:none;">
+        </div>
+
+        <div class="field">
+          <label for="title">Title</label>
+          <input type="text" id="title" name="title" placeholder="e.g. Grade 6 Mathematics — End Term 2" required>
+        </div>
+
+        <div class="field">
+          <label for="subject">Subject</label>
+          <input type="text" id="subject" name="subject" placeholder="e.g. Mathematics" required>
+        </div>
+
+        <div class="field">
+          <label for="level">Level</label>
+          <select id="level" name="level" required>
+            <option value="" disabled selected>Choose level</option>
+            {% for lvl in levels %}
+            <option value="{{ lvl }}">{{ lvl }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="resource_type">Resource type</label>
+          <select id="resource_type" name="resource_type" required>
+            <option value="" disabled selected>Choose type</option>
+            {% for t in types %}
+            <option value="{{ t }}">{{ t }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="price_kes">Price (KSh)</label>
+          <input type="number" id="price_kes" name="price_kes" value="100" min="1" required>
+        </div>
+
+        <div class="field">
+          <label for="description">Short description (optional)</label>
+          <input type="text" id="description" name="description" placeholder="e.g. Includes full marking scheme">
+        </div>
+
+        <div class="submit-row">
+          <button type="submit" class="btn-primary" id="uploadBtn">Upload resource</button>
+          <span class="form-msg" id="formMsg"></span>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+  <!-- Resource list -->
+  <div class="panel">
+    <h2>Catalog</h2>
+    <p class="panel-sub">All resources, active and inactive.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Level</th>
+            <th>Subject</th>
+            <th>Type</th>
+            <th>Pages</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="resourceTableBody">
+          <tr><td colspan="8" class="loading-row">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Edit modal -->
+<div class="modal-overlay" id="editOverlay">
+  <div class="modal">
+    <h3>Edit resource</h3>
+    <form id="editForm">
+      <input type="hidden" id="editId">
+      <div class="field">
+        <label for="editTitle">Title</label>
+        <input type="text" id="editTitle" required>
+      </div>
+      <div class="field">
+        <label for="editSubject">Subject</label>
+        <input type="text" id="editSubject" required>
+      </div>
+      <div class="field">
+        <label for="editLevel">Level</label>
+        <select id="editLevel" required>
+          {% for lvl in levels %}<option value="{{ lvl }}">{{ lvl }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="editType">Resource type</label>
+        <select id="editType" required>
+          {% for t in types %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="editPrice">Price (KSh)</label>
+        <input type="number" id="editPrice" min="1" required>
+      </div>
+      <div class="field">
+        <label for="editDescription">Description</label>
+        <input type="text" id="editDescription">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="editCancel">Cancel</button>
+        <button type="submit" class="btn-primary">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // ---------- Upload ----------
+  const fileDrop = document.getElementById('fileDrop');
+  const fileInput = document.getElementById('fileInput');
+  const fname = document.getElementById('fname');
+
+  fileDrop.addEventListener('click', () => fileInput.click());
+  fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('dragover'); });
+  fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
+  fileDrop.addEventListener('drop', e => {
+    e.preventDefault();
+    fileDrop.classList.remove('dragover');
+    if (e.dataTransfer.files.length) {
+      fileInput.files = e.dataTransfer.files;
+      updateFname();
+    }
+  });
+  fileInput.addEventListener('change', updateFname);
+  function updateFname() {
+    fname.textContent = fileInput.files.length ? fileInput.files[0].name : '';
+  }
+
+  document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('formMsg');
+    const btn = document.getElementById('uploadBtn');
+    msg.textContent = '';
+    msg.className = 'form-msg';
+
+    if (!fileInput.files.length) {
+      msg.textContent = 'Please choose a PDF file.';
+      msg.classList.add('error');
+      return;
+    }
+
+    const formData = new FormData(document.getElementById('uploadForm'));
+    btn.disabled = true;
+    btn.textContent = 'Uploading…';
+
+    try {
+      const res = await fetch('/admin/api/resources', { method: 'POST', body: formData });
+      const data = await res.json();
+
+      if (!res.ok) {
+        msg.textContent = data.error || 'Upload failed.';
+        msg.classList.add('error');
+        return;
+      }
+
+      msg.textContent = 'Uploaded successfully.';
+      msg.classList.add('success');
+      document.getElementById('uploadForm').reset();
+      fname.textContent = '';
+      loadResources();
+    } catch (err) {
+      msg.textContent = 'Network error — please try again.';
+      msg.classList.add('error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Upload resource';
+    }
+  });
+
+  // ---------- Resource table ----------
+  async function loadResources() {
+    const tbody = document.getElementById('resourceTableBody');
+    tbody.innerHTML = '<tr><td colspan="8" class="loading-row">Loading…</td></tr>';
+
+    const res = await fetch('/admin/api/resources');
+    if (res.status === 401) { window.location.href = '/admin/login'; return; }
+    const resources = await res.json();
+
+    if (resources.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No resources uploaded yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = '';
+    resources.forEach(r => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(r.title)}</td>
+        <td>${escapeHtml(r.level)}</td>
+        <td>${escapeHtml(r.subject)}</td>
+        <td><span class="tag">${escapeHtml(r.resource_type)}</span></td>
+        <td>${r.page_count || '—'}</td>
+        <td class="price-cell">KSh ${r.price_kes}</td>
+        <td><span class="status-pill ${r.is_active ? 'active' : 'inactive'}">${r.is_active ? 'Active' : 'Inactive'}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="icon-action" title="Edit" data-action="edit" data-id="${r.id}">✎</button>
+            <button class="icon-action" title="${r.is_active ? 'Deactivate' : 'Activate'}" data-action="toggle" data-id="${r.id}" data-active="${r.is_active}">${r.is_active ? '⏸' : '▶'}</button>
+            <button class="icon-action danger" title="Delete" data-action="delete" data-id="${r.id}">🗑</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Keep a lookup for the edit modal
+    window.__resourceCache = {};
+    resources.forEach(r => window.__resourceCache[r.id] = r);
+  }
+
+  document.getElementById('resourceTableBody').addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const action = btn.dataset.action;
+
+    if (action === 'edit') {
+      openEditModal(window.__resourceCache[id]);
+    } else if (action === 'toggle') {
+      const currentlyActive = btn.dataset.active === 'true';
+      await fetch(`/admin/api/resources/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_active: !currentlyActive }),
+      });
+      loadResources();
+    } else if (action === 'delete') {
+      if (confirm('Delete this resource permanently? This cannot be undone.')) {
+        await fetch(`/admin/api/resources/${id}`, { method: 'DELETE' });
+        loadResources();
+      }
+    }
+  });
+
+  // ---------- Edit modal ----------
+  const editOverlay = document.getElementById('editOverlay');
+
+  function openEditModal(r) {
+    document.getElementById('editId').value = r.id;
+    document.getElementById('editTitle').value = r.title;
+    document.getElementById('editSubject').value = r.subject;
+    document.getElementById('editLevel').value = r.level;
+    document.getElementById('editType').value = r.resource_type;
+    document.getElementById('editPrice').value = r.price_kes;
+    document.getElementById('editDescription').value = r.description || '';
+    editOverlay.classList.add('open');
+  }
+  document.getElementById('editCancel').addEventListener('click', () => editOverlay.classList.remove('open'));
+
+  document.getElementById('editForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('editId').value;
+    const payload = {
+      title: document.getElementById('editTitle').value.trim(),
+      subject: document.getElementById('editSubject').value.trim(),
+      level: document.getElementById('editLevel').value,
+      resource_type: document.getElementById('editType').value,
+      price_kes: parseInt(document.getElementById('editPrice').value, 10),
+      description: document.getElementById('editDescription').value.trim(),
+    };
+    const res = await fetch(`/admin/api/resources/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      editOverlay.classList.remove('open');
+      loadResources();
+    } else {
+      const data = await res.json();
+      alert(data.error || 'Could not save changes.');
+    }
+  });
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str ?? '';
+    return div.innerHTML;
+  }
+
+  loadResources();
+</script>
+
+</body>
+</html>

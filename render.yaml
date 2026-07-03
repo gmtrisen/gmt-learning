@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: gmt-learning
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: INTASEND_PUBLISHABLE_KEY
+        sync: false
+      - key: INTASEND_SECRET_KEY
+        sync: false
+      - key: INTASEND_TEST_MODE
+        value: "true"
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: gmt-learning-db
+          property: connectionString
+
+databases:
+  - name: gmt-learning-db
+    plan: free

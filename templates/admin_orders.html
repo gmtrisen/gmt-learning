@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orders — GMT_Learning Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1B4332; --gold:#D4A017; --cream:#FAF6ED; --paper:#F1EAD9;
+    --ink:#2D2A26; --ink-soft:#5C5650; --stamp:#A8443A; --ok:#2D6A4F; --line:#DDD3B8; --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--ink);line-height:1.5;}
+  h1,h2{font-family:'Fraunces',serif;font-weight:600;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+
+  .topbar{
+    background:var(--forest);color:var(--cream);padding:14px 24px;
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  }
+  .topbar .left{display:flex;align-items:center;gap:12px;}
+  .topbar .badge{
+    width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.12);
+    display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;
+    font-weight:700;font-size:0.7rem;border:2px solid var(--gold);
+  }
+  .topbar h1{font-size:1.1rem;}
+  .topbar nav{display:flex;gap:16px;}
+  .topbar nav a{font-size:0.85rem;font-weight:600;opacity:0.85;padding:6px 0;}
+  .topbar nav a.active{opacity:1;border-bottom:2px solid var(--gold);}
+  .logout{font-size:0.8rem;font-weight:600;opacity:0.8;}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 24px 60px;}
+
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+  @media (max-width:700px){.stats-row{grid-template-columns:1fr;}}
+  .stat-card{background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);padding:18px 20px;}
+  .stat-card .lbl{font-size:0.76rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;}
+  .stat-card .val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.5rem;color:var(--forest);}
+  .stat-card.highlight .val{color:var(--stamp);}
+
+  .panel{background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);padding:24px;}
+  .panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+  .filter-row{display:flex;gap:8px;}
+  .filter-btn{
+    font-size:0.8rem;font-weight:600;padding:6px 14px;border-radius:20px;
+    border:1.5px solid var(--line);color:var(--ink-soft);
+  }
+  .filter-btn.active{background:var(--forest);color:var(--cream);border-color:var(--forest);}
+
+  table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+  thead th{
+    text-align:left;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;
+    color:var(--ink-soft);padding:8px 10px;border-bottom:2px solid var(--line);
+  }
+  tbody td{padding:10px 10px;border-bottom:1px solid var(--line);}
+  tbody tr:hover{background:var(--paper);}
+  .ref-cell{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--forest);}
+  .status-pill{font-size:0.7rem;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-block;}
+  .status-pill.paid{background:#DCEDE2;color:var(--ok);}
+  .status-pill.pending{background:#F5EAD0;color:#946C0E;}
+  .status-pill.failed{background:#F1E0DD;color:var(--stamp);}
+  .amount-cell{font-family:'JetBrains Mono',monospace;font-weight:700;}
+  .empty-state, .loading-row{text-align:center;padding:30px;color:var(--ink-soft);font-size:0.88rem;}
+  .table-scroll{overflow-x:auto;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="left">
+    <div class="badge">GM</div>
+    <h1>GMT_Learning Admin</h1>
+  </div>
+  <nav>
+    <a href="/admin">Resources</a>
+    <a href="/admin/orders" class="active">Orders</a>
+  </nav>
+  <a href="/admin/logout" class="logout">Log out</a>
+</div>
+
+<div class="wrap">
+
+  <div class="stats-row">
+    <div class="stat-card highlight">
+      <div class="lbl">Confirmed revenue</div>
+      <div class="val" id="totalRevenue">KSh 0</div>
+    </div>
+    <div class="stat-card">
+      <div class="lbl">Paid orders shown</div>
+      <div class="val" id="paidCount">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="lbl">Total orders shown</div>
+      <div class="val" id="totalCount">0</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2 style="font-size:1.1rem;color:var(--forest);">Recent orders</h2>
+      <div class="filter-row" id="filterRow">
+        <button class="filter-btn active" data-status="">All</button>
+        <button class="filter-btn" data-status="paid">Paid</button>
+        <button class="filter-btn" data-status="pending">Pending</button>
+        <button class="filter-btn" data-status="failed">Failed</button>
+      </div>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Order Ref</th>
+            <th>Resource</th>
+            <th>Phone</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody id="ordersBody">
+          <tr><td colspan="6" class="loading-row">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let currentFilter = '';
+
+  async function loadOrders() {
+    const tbody = document.getElementById('ordersBody');
+    tbody.innerHTML = '<tr><td colspan="6" class="loading-row">Loading…</td></tr>';
+
+    const url = currentFilter ? `/admin/api/orders?status=${currentFilter}` : '/admin/api/orders';
+    const res = await fetch(url);
+    if (res.status === 401) { window.location.href = '/admin/login'; return; }
+    const data = await res.json();
+
+    document.getElementById('totalRevenue').textContent = `KSh ${data.paid_total_kes.toLocaleString()}`;
+    document.getElementById('totalCount').textContent = data.orders.length;
+    document.getElementById('paidCount').textContent = data.orders.filter(o => o.status === 'paid').length;
+
+    if (data.orders.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No orders yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = '';
+    data.orders.forEach(o => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="ref-cell">${escapeHtml(o.order_ref)}</td>
+        <td>${escapeHtml(o.resource_title)}</td>
+        <td>${escapeHtml(o.phone_number)}</td>
+        <td class="amount-cell">KSh ${o.amount_kes}</td>
+        <td><span class="status-pill ${o.status}">${o.status}</span></td>
+        <td>${formatDate(o.created_at)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleString('en-KE', { dateStyle: 'medium', timeStyle: 'short' });
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str ?? '';
+    return div.innerHTML;
+  }
+
+  document.getElementById('filterRow').addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.status;
+    loadOrders();
+  });
+
+  loadOrders();
+</script>
+
+</body>
+</html>

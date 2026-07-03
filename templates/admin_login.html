@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — GMT_Learning</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1B4332; --gold:#D4A017; --cream:#FAF6ED; --paper:#F1EAD9;
+    --ink:#2D2A26; --ink-soft:#5C5650; --stamp:#A8443A; --line:#DDD3B8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Inter',sans-serif;background:var(--forest);color:var(--ink);
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+  }
+  .card{
+    background:var(--cream);border-radius:16px;max-width:380px;width:100%;
+    padding:36px 32px;box-shadow:0 24px 60px -12px rgba(0,0,0,0.4);
+  }
+  .badge{
+    width:46px;height:46px;border-radius:50%;background:var(--forest);color:var(--gold);
+    display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;
+    font-weight:700;font-size:0.85rem;border:2px solid var(--gold);margin-bottom:18px;
+  }
+  h1{font-family:'Fraunces',serif;font-size:1.3rem;color:var(--forest);margin-bottom:4px;}
+  .sub{font-size:0.85rem;color:var(--ink-soft);margin-bottom:24px;}
+  label{font-size:0.8rem;font-weight:600;display:block;margin-bottom:8px;}
+  input[type="password"]{
+    width:100%;padding:13px 14px;border:2px solid var(--line);border-radius:10px;
+    font-size:1rem;background:var(--paper);outline:none;margin-bottom:8px;font-family:inherit;
+  }
+  input[type="password"]:focus{border-color:var(--gold);}
+  .error{color:var(--stamp);font-size:0.82rem;font-weight:600;margin-bottom:14px;}
+  button{
+    width:100%;background:var(--forest);color:var(--cream);padding:14px;border-radius:10px;
+    font-weight:600;font-size:0.95rem;border:none;cursor:pointer;margin-top:8px;
+    box-shadow:0 4px 0 #102b1f;font-family:inherit;
+  }
+  button:active{transform:translateY(2px);box-shadow:0 1px 0 #102b1f;}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">GM</div>
+    <h1>GMT_Learning Admin</h1>
+    <p class="sub">Sign in to manage resources and view orders.</p>
+    <form method="POST">
+      <label for="password">Admin password</label>
+      <input type="password" id="password" name="password" autofocus required>
+      {% if error %}<div class="error">{{ error }}</div>{% endif %}
+      <button type="submit">Sign in</button>
+    </form>
+  </div>
+</body>
+</html>

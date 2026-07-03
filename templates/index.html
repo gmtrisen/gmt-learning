@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMT_Learning — Kenyan CBC & KCSE Resources</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1B4332;
+    --forest-light:#2D6A4F;
+    --gold:#D4A017;
+    --gold-light:#E8C158;
+    --cream:#FAF6ED;
+    --paper:#F1EAD9;
+    --ink:#2D2A26;
+    --ink-soft:#5C5650;
+    --stamp:#A8443A;
+    --line:#DDD3B8;
+    --ok:#2D6A4F;
+    --radius:14px;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    line-height:1.5;
+    padding-bottom:84px;
+  }
+
+  h1,h2,h3,.display{font-family:'Fraunces',serif;font-weight:600;letter-spacing:-0.01em;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+  img{max-width:100%;display:block;}
+  input{font-family:inherit;}
+
+  .grain{
+    position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .topbar{position:sticky;top:0;z-index:50;background:var(--cream);border-bottom:2px solid var(--forest);}
+  .topbar-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:28px;padding:14px 24px;}
+  .logo{display:flex;align-items:center;gap:10px;font-family:'Fraunces',serif;font-weight:700;font-size:1.3rem;color:var(--forest);white-space:nowrap;}
+  .logo .badge{
+    width:34px;height:34px;border-radius:50%;background:var(--forest);color:var(--gold-light);
+    display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;
+    font-size:0.7rem;font-weight:700;border:2px solid var(--gold);
+  }
+  .nav-links{display:flex;gap:6px;flex:1;}
+  .nav-links a{padding:9px 14px;border-radius:8px;font-weight:600;font-size:0.92rem;color:var(--ink-soft);transition:background .15s, color .15s;}
+  .nav-links a:hover, .nav-links a.active{background:var(--paper);color:var(--forest);}
+  .nav-right{display:flex;align-items:center;gap:10px;}
+  .search-box{display:flex;align-items:center;gap:8px;background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:8px 14px;min-width:230px;}
+  .search-box input{border:none;background:none;outline:none;font-size:0.88rem;width:100%;color:var(--ink);}
+  .icon-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--paper);border:1.5px solid var(--line);transition:transform .15s, background .15s;}
+  .icon-btn:hover{background:var(--gold-light);transform:translateY(-1px);}
+
+  @media (max-width:900px){.nav-links, .search-box{display:none;}}
+
+  .hero{max-width:1200px;margin:0 auto;padding:56px 24px 44px;display:grid;grid-template-columns:1.1fr 0.9fr;gap:48px;align-items:center;position:relative;z-index:1;}
+  @media (max-width:900px){.hero{grid-template-columns:1fr;padding:32px 20px 32px;gap:28px;}}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:600;
+    letter-spacing:0.08em;text-transform:uppercase;color:var(--forest);background:var(--paper);border:1px solid var(--line);
+    padding:6px 12px;border-radius:20px;margin-bottom:18px;
+  }
+  .eyebrow::before{content:"●";color:var(--gold);font-size:0.6rem;}
+  .hero h1{font-size:clamp(2rem,4vw,3.1rem);color:var(--forest);line-height:1.1;margin-bottom:16px;}
+  .hero h1 em{font-style:normal;color:var(--stamp);text-decoration:underline wavy var(--gold) 2px;text-underline-offset:6px;}
+  .hero p{font-size:1.02rem;color:var(--ink-soft);max-width:480px;margin-bottom:22px;}
+  .hero-stats{display:flex;gap:24px;margin-top:8px;flex-wrap:wrap;}
+  .hero-stats .num{font-size:1.4rem;font-weight:700;color:var(--forest);display:block;font-family:'JetBrains Mono',monospace;}
+  .hero-stats .lbl{font-size:0.7rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.04em;}
+
+  .hero-visual{position:relative;display:flex;justify-content:center;}
+  .doc-stack{position:relative;width:260px;height:330px;}
+  .doc-card{position:absolute;width:240px;height:310px;background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 18px 40px -10px rgba(27,67,50,0.25);padding:20px;}
+  .doc-card.back{transform:rotate(-7deg) translate(-16px,6px);background:var(--paper);z-index:1;}
+  .doc-card.front{transform:rotate(3deg);z-index:2;}
+  .doc-line{height:7px;background:var(--line);border-radius:3px;margin-bottom:9px;}
+  .doc-line.w60{width:60%;} .doc-line.w90{width:90%;} .doc-line.w40{width:40%;}
+  .doc-head{display:flex;justify-content:space-between;border-bottom:1.5px dashed var(--line);padding-bottom:9px;margin-bottom:14px;}
+  .doc-head .t{font-family:'Fraunces',serif;font-weight:600;font-size:0.85rem;color:var(--forest);}
+  .doc-head .s{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--ink-soft);}
+  .stamp-mark{
+    position:absolute;top:16px;right:-12px;width:74px;height:74px;border-radius:50%;border:3px solid var(--stamp);color:var(--stamp);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-18deg);
+    font-family:'JetBrains Mono',monospace;font-weight:700;background:rgba(255,255,255,0.6);z-index:3;
+  }
+  .stamp-mark .top{font-size:0.5rem;letter-spacing:0.05em;}
+  .stamp-mark .mid{font-size:0.92rem;line-height:1;}
+  .stamp-mark .bot{font-size:0.44rem;letter-spacing:0.06em;}
+
+  .section{max-width:1200px;margin:0 auto;padding:36px 24px;position:relative;z-index:1;}
+  .section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+  .section-head h2{font-size:1.4rem;color:var(--forest);}
+  .levels-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;}
+  .levels-row::-webkit-scrollbar{display:none;}
+  .level-chip{
+    flex:0 0 auto;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px 16px;
+    min-width:96px;text-align:center;transition:border-color .15s, transform .15s;cursor:pointer;
+  }
+  .level-chip:hover{border-color:var(--gold);transform:translateY(-2px);}
+  .level-chip.active{border-color:var(--forest);background:var(--paper);}
+  .level-chip .lvl-name{font-weight:600;font-size:0.82rem;color:var(--forest);}
+
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  @media (max-width:1000px){.grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.grid{grid-template-columns:1fr 1fr;gap:12px;}}
+
+  .res-card{background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:transform .15s, box-shadow .15s;}
+  .res-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px -8px rgba(27,67,50,0.18);}
+  .res-thumb{background:var(--paper);height:90px;position:relative;display:flex;align-items:center;justify-content:center;border-bottom:1.5px dashed var(--line);}
+  .res-thumb .ghost-lines{width:70%;}
+  .res-thumb .ghost-lines div{height:5px;background:#fff;border-radius:2px;margin-bottom:6px;opacity:0.8;}
+  .res-type-tag{
+    position:absolute;top:8px;left:8px;background:var(--forest);color:var(--cream);font-size:0.6rem;font-weight:700;
+    text-transform:uppercase;letter-spacing:0.04em;padding:3px 8px;border-radius:5px;font-family:'JetBrains Mono',monospace;
+  }
+  .res-body{padding:14px 14px 16px;display:flex;flex-direction:column;gap:6px;flex:1;}
+  .res-body .res-level{font-size:0.68rem;color:var(--ink-soft);font-weight:600;font-family:'JetBrains Mono',monospace;}
+  .res-body .res-title{font-size:0.94rem;font-weight:600;color:var(--ink);line-height:1.3;}
+  .res-body .res-meta{font-size:0.72rem;color:var(--ink-soft);}
+  .res-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:6px;}
+  .price-stamp{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.84rem;color:var(--stamp);border:1.5px solid var(--stamp);border-radius:20px;padding:3px 10px;}
+  .buy-btn{background:var(--forest);color:var(--cream);font-size:0.78rem;font-weight:700;padding:8px 14px;border-radius:8px;transition:transform .12s;}
+  .buy-btn:active{transform:scale(0.93) rotate(-2deg);}
+
+  .empty-state{grid-column:1 / -1;text-align:center;padding:40px 20px;color:var(--ink-soft);font-size:0.92rem;}
+  .loading-state{grid-column:1 / -1;text-align:center;padding:40px 20px;color:var(--ink-soft);font-size:0.9rem;}
+
+  .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  @media (max-width:760px){.how-grid{grid-template-columns:1fr;}}
+  .how-card{background:var(--paper);border-radius:var(--radius);padding:22px;border:1.5px solid var(--line);}
+  .how-num{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gold);font-size:0.78rem;margin-bottom:8px;}
+  .how-card h3{font-size:1rem;color:var(--forest);margin-bottom:6px;}
+  .how-card p{font-size:0.85rem;color:var(--ink-soft);}
+
+  footer{background:var(--forest);color:var(--cream);margin-top:30px;padding:36px 24px 100px;}
+  .footer-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px;}
+  .footer-col h4{font-size:0.82rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--gold-light);margin-bottom:10px;}
+  .footer-col a, .footer-col p{display:block;font-size:0.83rem;opacity:0.85;margin-bottom:7px;}
+
+  .sunrise-dock{display:none;position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:60;width:calc(100% - 28px);max-width:420px;}
+  .dock-shape{position:relative;background:var(--forest);border-radius:28px;box-shadow:0 12px 30px -8px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:space-between;padding:10px 8px;}
+  .dock-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;color:rgba(250,246,237,0.6);font-size:0.6rem;font-weight:600;padding:6px 0;position:relative;}
+  .dock-item.active{color:var(--cream);}
+  .dock-item .ic{width:20px;height:20px;}
+  .dock-item.center{margin-top:-26px;}
+  .dock-item.center .ic-wrap{
+    width:52px;height:52px;border-radius:50%;background:linear-gradient(150deg, var(--gold-light), var(--gold) 55%, var(--stamp));
+    display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px -2px rgba(212,160,23,0.6), 0 0 0 5px var(--cream);color:var(--forest);
+  }
+  .dock-item.center span{color:var(--cream);margin-top:2px;}
+  @media (max-width:900px){.sunrise-dock{display:block;}}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(27,30,26,0.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:100;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:var(--radius);max-width:440px;width:100%;box-shadow:0 24px 60px -12px rgba(0,0,0,0.35);overflow:hidden;max-height:92vh;overflow-y:auto;}
+
+  .modal-head{background:var(--forest);color:var(--cream);padding:20px 22px;position:relative;}
+  .modal-head .tag-mini{
+    font-family:'JetBrains Mono',monospace;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;
+    background:rgba(255,255,255,0.12);display:inline-block;padding:3px 9px;border-radius:5px;margin-bottom:8px;
+  }
+  .modal-head h3{font-size:1.08rem;margin-bottom:3px;}
+  .modal-head .sub{font-size:0.78rem;opacity:0.75;}
+  .modal-head .price-row{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.25);}
+  .modal-head .price-label{font-size:0.76rem;opacity:0.8;}
+  .modal-head .price-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.2rem;color:var(--gold-light);}
+
+  .perf{height:13px;background:radial-gradient(circle at 50% 0, transparent 6px, var(--forest) 6.5px) top / 18px 13px repeat-x;}
+
+  .modal-body{padding:22px;}
+
+  .field{margin-bottom:6px;}
+  .field label{font-size:0.8rem;font-weight:600;display:block;margin-bottom:8px;}
+  .field input{width:100%;padding:13px 14px;border:2px solid var(--line);border-radius:10px;font-size:1rem;background:var(--paper);outline:none;transition:border-color .15s;font-family:'JetBrains Mono',monospace;}
+  .field input:focus{border-color:var(--gold);}
+  .field-hint{font-size:0.74rem;color:var(--ink-soft);margin-top:7px;margin-bottom:14px;}
+  .field-err{font-size:0.78rem;color:var(--stamp);margin-top:7px;margin-bottom:10px;display:none;font-weight:600;}
+
+  .modal-btn{width:100%;background:var(--forest);color:var(--cream);padding:14px;border-radius:10px;font-weight:600;margin-top:14px;box-shadow:0 4px 0 #102b1f;transition:transform .12s;font-size:0.95rem;}
+  .modal-btn:hover{transform:translateY(-1px);}
+  .modal-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #102b1f;}
+  .modal-btn:disabled{opacity:0.6;cursor:not-allowed;}
+  .modal-cancel{width:100%;text-align:center;font-size:0.82rem;color:var(--ink-soft);margin-top:10px;font-weight:600;padding:8px;}
+
+  .state-pending, .state-paid, .state-failed{display:none;text-align:center;padding:6px 0;}
+  .state-pending.active, .state-paid.active, .state-failed.active{display:block;}
+  .spinner{width:56px;height:56px;border:4px solid var(--line);border-top-color:var(--gold);border-radius:50%;margin:6px auto 18px;animation:spin 0.9s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .stamp-final{
+    width:96px;height:96px;margin:6px auto 16px;border-radius:50%;border:3.5px solid var(--ok);color:var(--ok);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);
+    font-family:'JetBrains Mono',monospace;font-weight:700;animation:stampdown 0.4s cubic-bezier(.2,1.4,.4,1);
+  }
+  @keyframes stampdown{0%{transform:rotate(-8deg) scale(1.8);opacity:0;}60%{transform:rotate(-8deg) scale(0.92);opacity:1;}100%{transform:rotate(-8deg) scale(1);}}
+  .stamp-final .mid{font-size:1.6rem;line-height:1;}
+
+  .download-link{display:inline-block;margin-top:6px;background:var(--stamp);color:#fff;padding:14px 24px;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.92rem;box-shadow:0 4px 0 #6e2c26;}
+  .fail-icon{font-size:2.4rem;color:var(--stamp);margin-bottom:8px;}
+  .retry-btn{margin-top:14px;border:1.5px solid var(--forest);color:var(--forest);padding:11px 20px;border-radius:8px;font-weight:600;font-size:0.86rem;}
+
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+  *:focus-visible{outline:2.5px solid var(--stamp);outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="#" class="logo"><span class="badge">GM</span>GMT_Learning</a>
+    <nav class="nav-links">
+      <a href="#" class="active">Home</a>
+      <a href="#levels">Levels</a>
+      <a href="#browse">Browse</a>
+      <a href="#how">How it works</a>
+    </nav>
+    <div class="nav-right">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" placeholder="Search resources" id="searchInput">
+      </div>
+      <button class="icon-btn" aria-label="Account">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div>
+    <span class="eyebrow">PP1 — Form 4 · KICD Aligned</span>
+    <h1>Every paper your child needs, <em>stamped, sealed, ready.</em></h1>
+    <p>Past papers, revision sets, notes and assessments for every CBC grade and Form 3–4 — download instantly after a quick KSh 100 M-Pesa payment.</p>
+    <div class="hero-stats">
+      <div><span class="num" id="statCount">—</span><span class="lbl">Resources</span></div>
+      <div><span class="num">PP1–F4</span><span class="lbl">All levels</span></div>
+      <div><span class="num">KSh 100</span><span class="lbl">Per download</span></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="doc-stack">
+      <div class="doc-card back"><div class="doc-line w60"></div><div class="doc-line w90"></div><div class="doc-line w40"></div></div>
+      <div class="doc-card front">
+        <div class="doc-head"><div><div class="t">Grade 7 Maths</div><div class="s">END TERM · 2025</div></div><div class="s">MARKS: 100</div></div>
+        <div class="doc-line w90"></div><div class="doc-line w60"></div><div class="doc-line w90"></div>
+        <div class="doc-line w40"></div><div class="doc-line w90"></div><div class="doc-line w60"></div>
+        <div class="stamp-mark"><span class="top">VERIFIED</span><span class="mid">KSh100</span><span class="bot">GMT_LEARNING</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="levels">
+  <div class="section-head"><h2>Browse by level</h2></div>
+  <div class="levels-row" id="levelsRow">
+    <button class="level-chip active" data-level="">All levels</button>
+    <button class="level-chip" data-level="PP1">PP1</button>
+    <button class="level-chip" data-level="PP2">PP2</button>
+    <button class="level-chip" data-level="Grade 1">Grade 1</button>
+    <button class="level-chip" data-level="Grade 2">Grade 2</button>
+    <button class="level-chip" data-level="Grade 3">Grade 3</button>
+    <button class="level-chip" data-level="Grade 4">Grade 4</button>
+    <button class="level-chip" data-level="Grade 5">Grade 5</button>
+    <button class="level-chip" data-level="Grade 6">Grade 6</button>
+    <button class="level-chip" data-level="Grade 7">Grade 7</button>
+    <button class="level-chip" data-level="Grade 8">Grade 8</button>
+    <button class="level-chip" data-level="Grade 9">Grade 9</button>
+    <button class="level-chip" data-level="Grade 10">Grade 10</button>
+    <button class="level-chip" data-level="Form 3">Form 3</button>
+    <button class="level-chip" data-level="Form 4">Form 4</button>
+  </div>
+</section>
+
+<section class="section" id="browse">
+  <div class="section-head"><h2 id="browseHeading">All resources</h2></div>
+  <div class="grid" id="resourceGrid">
+    <div class="loading-state">Loading resources…</div>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="section-head"><h2>How a download works</h2></div>
+  <div class="how-grid">
+    <div class="how-card"><div class="how-num">STEP 1</div><h3>Pick a resource</h3><p>Find the exact paper, notes, or revision set you need by level and subject.</p></div>
+    <div class="how-card"><div class="how-num">STEP 2</div><h3>Pay KSh 100 on M-Pesa</h3><p>Enter your phone number — you'll get an STK push prompt to approve with your PIN.</p></div>
+    <div class="how-card"><div class="how-num">STEP 3</div><h3>Download instantly</h3><p>Once confirmed, your download unlocks right away — no waiting, no codes to type.</p></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-col">
+      <h4>GMT_Learning</h4>
+      <p>Kenyan curriculum resources, PP1 to Form 4.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Levels</h4>
+      <a href="#levels">PP1 &amp; PP2</a>
+      <a href="#levels">Grade 1–9</a>
+      <a href="#levels">Grade 10</a>
+      <a href="#levels">Form 3 &amp; 4</a>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a href="#how">How payment works</a>
+    </div>
+  </div>
+</footer>
+
+<nav class="sunrise-dock" aria-label="Mobile navigation">
+  <div class="dock-shape">
+    <a class="dock-item active" href="#">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      Home
+    </a>
+    <a class="dock-item" href="#browse">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      Browse
+    </a>
+    <a class="dock-item center" href="#levels">
+      <span class="ic-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      </span>
+      <span>Levels</span>
+    </a>
+    <a class="dock-item" href="#how">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 1 1 5.83 1c0 2-3 2-3 5"/><path d="M12 17h.01"/></svg>
+      Help
+    </a>
+    <a class="dock-item" href="#">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+      Account
+    </a>
+  </div>
+</nav>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+
+    <div class="modal-head">
+      <span class="tag-mini" id="modalTypeTag">Resource</span>
+      <h3 id="modalResourceTitle">Resource title</h3>
+      <div class="sub" id="modalResourceMeta">Level · Subject</div>
+      <div class="price-row">
+        <span class="price-label">Amount due</span>
+        <span class="price-val">KSh <span id="priceLabel">100</span></span>
+      </div>
+    </div>
+    <div class="perf"></div>
+
+    <div class="modal-body">
+
+      <div id="statePhone">
+        <div class="field">
+          <label for="phoneInput">Your M-Pesa phone number</label>
+          <input type="tel" id="phoneInput" placeholder="07XX XXX XXX" inputmode="numeric">
+          <div class="field-hint">We'll send a payment prompt to this number — enter your M-Pesa PIN there to confirm.</div>
+          <div class="field-err" id="phoneErr">Enter a valid Safaricom number, e.g. 0712345678.</div>
+        </div>
+        <button class="modal-btn" id="payBtn">Send payment request</button>
+        <button class="modal-cancel" id="cancelBtn1">Cancel</button>
+      </div>
+
+      <div class="state-pending" id="statePending">
+        <div class="spinner"></div>
+        <h3>Check your phone</h3>
+        <p style="color:var(--ink-soft);font-size:0.88rem;margin-top:6px;">
+          We sent a payment prompt to <span id="pendingPhone"></span> for KSh <span id="pendingAmount">100</span>.
+          Enter your M-Pesa PIN there to finish.
+        </p>
+        <button class="modal-cancel" id="cancelBtn2">Cancel</button>
+      </div>
+
+      <div class="state-paid" id="statePaid">
+        <div class="stamp-final"><span class="mid">✓</span></div>
+        <h3>Payment confirmed</h3>
+        <p style="color:var(--ink-soft);font-size:0.88rem;margin-top:6px;margin-bottom:6px;">Your download is ready.</p>
+        <a class="download-link" id="downloadLink" href="#">Download PDF</a>
+      </div>
+
+      <div class="state-failed" id="stateFailed">
+        <div class="fail-icon">⚠</div>
+        <h3>Payment didn't go through</h3>
+        <p style="color:var(--ink-soft);font-size:0.88rem;margin-top:6px;">
+          You may have entered the wrong PIN or cancelled the prompt. No charge was made.
+        </p>
+        <button class="retry-btn" id="retryBtn">Try again</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentResource = null;
+  let currentOrderRef = null;
+  let pollTimer = null;
+  let allResources = [];
+  let activeLevel = '';
+
+  async function loadResources() {
+    const grid = document.getElementById('resourceGrid');
+    grid.innerHTML = '<div class="loading-state">Loading resources…</div>';
+
+    const res = await fetch('/api/resources');
+    allResources = await res.json();
+    document.getElementById('statCount').textContent = allResources.length;
+    renderGrid();
+  }
+
+  function buildCard(r) {
+    const card = document.createElement('div');
+    card.className = 'res-card';
+    card.innerHTML = `
+      <div class="res-thumb">
+        <span class="res-type-tag">${escapeHtml(r.resource_type)}</span>
+        <div class="ghost-lines"><div></div><div></div><div></div></div>
+      </div>
+      <div class="res-body">
+        <span class="res-level">${escapeHtml(r.level.toUpperCase())} · ${escapeHtml(r.subject.toUpperCase())}</span>
+        <span class="res-title">${escapeHtml(r.title)}</span>
+        <span class="res-meta">${r.page_count} pages · PDF</span>
+        <div class="res-footer">
+          <span class="price-stamp">KSh ${r.price_kes}</span>
+          <button class="buy-btn" data-id="${r.id}">Unlock</button>
+        </div>
+      </div>
+    `;
+    card.querySelector('.buy-btn').addEventListener('click', () => openCheckout(r));
+    return card;
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('resourceGrid');
+    const heading = document.getElementById('browseHeading');
+    grid.innerHTML = '';
+
+    const filtered = activeLevel
+      ? allResources.filter(r => r.level === activeLevel)
+      : allResources;
+
+    heading.textContent = activeLevel ? `${activeLevel} resources` : 'All resources';
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '<div class="empty-state">No resources available yet — check back soon.</div>';
+      return;
+    }
+
+    filtered.forEach(r => grid.appendChild(buildCard(r)));
+  }
+
+  document.getElementById('levelsRow').addEventListener('click', (e) => {
+    const chip = e.target.closest('.level-chip');
+    if (!chip) return;
+    document.querySelectorAll('.level-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeLevel = chip.dataset.level;
+    document.getElementById('searchInput').value = '';
+    renderGrid();
+  });
+
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    const grid = document.getElementById('resourceGrid');
+    if (!q) { renderGrid(); return; }
+
+    const matches = allResources.filter(r =>
+      r.title.toLowerCase().includes(q) ||
+      r.subject.toLowerCase().includes(q) ||
+      r.level.toLowerCase().includes(q)
+    );
+    document.getElementById('browseHeading').textContent = `Results for "${e.target.value}"`;
+    grid.innerHTML = '';
+    if (matches.length === 0) {
+      grid.innerHTML = '<div class="empty-state">No matching resources found.</div>';
+      return;
+    }
+    matches.forEach(r => grid.appendChild(buildCard(r)));
+  });
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  const overlay = document.getElementById('modalOverlay');
+
+  function openCheckout(resource) {
+    currentResource = resource;
+    document.getElementById('modalTypeTag').textContent = resource.resource_type;
+    document.getElementById('modalResourceTitle').textContent = resource.title;
+    document.getElementById('modalResourceMeta').textContent = `${resource.level} · ${resource.subject}`;
+    document.getElementById('priceLabel').textContent = resource.price_kes;
+    showState('statePhone');
+    overlay.classList.add('open');
+    document.getElementById('phoneInput').value = '';
+    document.getElementById('phoneInput').focus();
+  }
+
+  function closeCheckout() {
+    overlay.classList.remove('open');
+    clearTimeout(pollTimer);
+  }
+
+  function showState(id) {
+    ['statePhone', 'statePending', 'statePaid', 'stateFailed'].forEach(s => {
+      const el = document.getElementById(s);
+      if (s === id) {
+        el.style.display = 'block';
+        el.classList.add('active');
+      } else {
+        el.style.display = 'none';
+        el.classList.remove('active');
+      }
+    });
+  }
+
+  document.getElementById('cancelBtn1').addEventListener('click', closeCheckout);
+  document.getElementById('cancelBtn2').addEventListener('click', closeCheckout);
+  document.getElementById('retryBtn').addEventListener('click', () => showState('statePhone'));
+
+  document.getElementById('payBtn').addEventListener('click', async () => {
+    const phoneInput = document.getElementById('phoneInput');
+    const err = document.getElementById('phoneErr');
+    const phone = phoneInput.value.trim();
+
+    const validFormat = /^(0|\+?254)?7\d{8}$|^(0|\+?254)?1\d{8}$/.test(phone.replace(/\s/g, ''));
+    if (!validFormat) {
+      err.style.display = 'block';
+      return;
+    }
+    err.style.display = 'none';
+
+    const btn = document.getElementById('payBtn');
+    btn.disabled = true;
+    btn.textContent = 'Sending request...';
+
+    try {
+      const res = await fetch('/api/checkout/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resource_id: currentResource.id, phone_number: phone }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        err.textContent = data.error || 'Something went wrong. Try again.';
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Send payment request';
+        return;
+      }
+
+      currentOrderRef = data.order_ref;
+      document.getElementById('pendingPhone').textContent = phone;
+      document.getElementById('pendingAmount').textContent = currentResource.price_kes;
+      showState('statePending');
+      pollStatus();
+    } catch (e) {
+      err.textContent = 'Network error — check your connection and try again.';
+      err.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send payment request';
+    }
+  });
+
+  function pollStatus() {
+    let attempts = 0;
+    const maxAttempts = 40;
+
+    async function check() {
+      attempts++;
+      try {
+        const res = await fetch(`/api/checkout/status/${currentOrderRef}`);
+        const data = await res.json();
+
+        if (data.status === 'paid') {
+          document.getElementById('downloadLink').href =
+            `/api/download/${currentOrderRef}/${data.download_token}`;
+          showState('statePaid');
+          return;
+        }
+        if (data.status === 'failed') {
+          showState('stateFailed');
+          return;
+        }
+      } catch (e) {
+        // transient network error — just keep polling
+      }
+
+      if (attempts < maxAttempts) {
+        pollTimer = setTimeout(check, 3000);
+      } else {
+        showState('stateFailed');
+      }
+    }
+    check();
+  }
+
+  loadResources();
+</script>
+
+</body>
+</html>
