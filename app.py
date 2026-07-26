@@ -65,8 +65,8 @@ INTASEND_TEST_MODE = os.environ.get("INTASEND_TEST_MODE", "true").lower() == "tr
 
 RESOURCE_PRICE_KES = 100
 
-# Cloudinary config — set these three as environment variables on Render.
-# Get them from: cloudinary.com → Dashboard → "API Keys" card.
+# Cloudinary — set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
+# as environment variables on Render. Get them from cloudinary.com → Dashboard.
 cloudinary.config(
     cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME", ""),
     api_key=os.environ.get("CLOUDINARY_API_KEY", ""),
@@ -112,7 +112,7 @@ class Resource(db.Model):
     resource_type = db.Column(db.String(40), nullable=False)  # Past Paper / Notes / Revision / Assessment / Exam
     description = db.Column(db.String(300), default="")
     page_count = db.Column(db.Integer, default=0)
-    file_path = db.Column(db.String(300), nullable=False)    # Cloudinary public_id (e.g. "gmt_learning/abc123")
+    file_path = db.Column(db.String(300), nullable=False)    # Cloudinary public_id, e.g. "gmt_learning/abc123_file.pdf"
     price_kes = db.Column(db.Integer, default=RESOURCE_PRICE_KES)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -335,20 +335,22 @@ def download_resource(order_ref, download_token):
 
     resource = Resource.query.get_or_404(order.resource_id)
 
-    # resource.file_path now stores the Cloudinary public_id (e.g. "gmt_learning/abc123")
-    # Generate a signed, time-limited download URL (expires in 5 minutes)
+    # resource.file_path holds the Cloudinary public_id (e.g. "gmt_learning/abc123_file.pdf")
+    # Generate a signed delivery URL — embedded token in path, no signature mismatch issues.
+    # expires_at: 5 minutes from now, after which the link stops working.
+    import time
     try:
-        signed_url = cloudinary.utils.private_download_url(
+        url, _ = cloudinary.utils.cloudinary_url(
             resource.file_path,
-            "pdf",
             resource_type="raw",
-            expires_at=int(__import__("time").time()) + 300,  # 5 minutes
+            sign_url=True,
+            expires_at=int(time.time()) + 300,
             attachment=True,
         )
     except Exception as exc:
         return jsonify({"error": f"Could not generate download link: {exc}"}), 500
 
-    return redirect(signed_url)
+    return redirect(url)
 
 
 # ---------------------------------------------------------------------------
@@ -466,29 +468,27 @@ def admin_create_resource():
     if errors:
         return jsonify({"error": " ".join(errors)}), 400
 
-    # Read file into memory so we can (a) count pages and (b) upload to Cloudinary
+    # Read into memory: needed for both page-count detection and Cloudinary upload
     file_bytes = file.read()
 
-    # Auto-detect page count from PDF bytes
+    # Auto-detect page count
     page_count = 0
     try:
         import io
         page_count = len(PdfReader(io.BytesIO(file_bytes)).pages)
     except Exception:
-        pass  # not fatal — corrupt/encrypted PDF still gets stored
+        pass
 
-    # Upload to Cloudinary under the "gmt_learning" folder.
-    # resource_type="raw" is required for PDFs (non-image files).
-    # The returned public_id is what we store — it's permanent and survives restarts.
+    # Upload to Cloudinary — resource_type="raw" is required for PDFs
     try:
-        upload_result = cloudinary.uploader.upload(
+        result = cloudinary.uploader.upload(
             file_bytes,
             folder="gmt_learning",
             resource_type="raw",
             use_filename=True,
             unique_filename=True,
         )
-        cloudinary_public_id = upload_result["public_id"]
+        cloudinary_public_id = result["public_id"]
     except Exception as exc:
         return jsonify({"error": f"File upload failed: {exc}"}), 502
 
@@ -499,7 +499,7 @@ def admin_create_resource():
         resource_type=resource_type,
         description=description,
         page_count=page_count,
-        file_path=cloudinary_public_id,  # stores Cloudinary public_id, not a local path
+        file_path=cloudinary_public_id,
         price_kes=price_kes,
         is_active=True,
     )
@@ -561,7 +561,7 @@ def admin_delete_resource(resource_id):
     """
     resource = Resource.query.get_or_404(resource_id)
 
-    # Remove the file from Cloudinary
+    # Delete from Cloudinary
     try:
         cloudinary.uploader.destroy(resource.file_path, resource_type="raw")
     except Exception:
