@@ -25,12 +25,15 @@ load_dotenv()  # reads .env in this folder and sets the variables below automati
 
 from flask import (
     Flask, request, jsonify, render_template, abort,
-    send_from_directory, session, redirect, url_for,
+    session, redirect, url_for,
 )
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from intasend import Collect
 from pypdf import PdfReader
+import cloudinary
+import cloudinary.uploader
+import cloudinary.utils
 
 # ---------------------------------------------------------------------------
 # App + config
@@ -61,8 +64,15 @@ INTASEND_SECRET_KEY = os.environ.get("INTASEND_SECRET_KEY", "")
 INTASEND_TEST_MODE = os.environ.get("INTASEND_TEST_MODE", "true").lower() == "true"
 
 RESOURCE_PRICE_KES = 100
-UPLOAD_DIR = os.environ.get("UPLOAD_DIR", os.path.join(os.path.dirname(__file__), "protected_files"))
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# Cloudinary config — set these three as environment variables on Render.
+# Get them from: cloudinary.com → Dashboard → "API Keys" card.
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME", ""),
+    api_key=os.environ.get("CLOUDINARY_API_KEY", ""),
+    api_secret=os.environ.get("CLOUDINARY_API_SECRET", ""),
+    secure=True,
+)
 
 MAX_UPLOAD_MB = 25
 app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_MB * 1024 * 1024
@@ -102,7 +112,7 @@ class Resource(db.Model):
     resource_type = db.Column(db.String(40), nullable=False)  # Past Paper / Notes / Revision / Assessment / Exam
     description = db.Column(db.String(300), default="")
     page_count = db.Column(db.Integer, default=0)
-    file_path = db.Column(db.String(300), nullable=False)    # path inside UPLOAD_DIR, never served directly
+    file_path = db.Column(db.String(300), nullable=False)    # Cloudinary public_id (e.g. "gmt_learning/abc123")
     price_kes = db.Column(db.Integer, default=RESOURCE_PRICE_KES)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -324,12 +334,21 @@ def download_resource(order_ref, download_token):
         abort(403)
 
     resource = Resource.query.get_or_404(order.resource_id)
-    return send_from_directory(
-        UPLOAD_DIR,
-        resource.file_path,
-        as_attachment=True,
-        download_name=f"{resource.title}.pdf",
-    )
+
+    # resource.file_path now stores the Cloudinary public_id (e.g. "gmt_learning/abc123")
+    # Generate a signed, time-limited download URL (expires in 5 minutes)
+    try:
+        signed_url = cloudinary.utils.private_download_url(
+            resource.file_path,
+            "pdf",
+            resource_type="raw",
+            expires_at=int(__import__("time").time()) + 300,  # 5 minutes
+            attachment=True,
+        )
+    except Exception as exc:
+        return jsonify({"error": f"Could not generate download link: {exc}"}), 500
+
+    return redirect(signed_url)
 
 
 # ---------------------------------------------------------------------------
@@ -447,18 +466,31 @@ def admin_create_resource():
     if errors:
         return jsonify({"error": " ".join(errors)}), 400
 
-    safe_name = secure_filename(file.filename)
-    stored_name = f"{uuid.uuid4().hex}_{safe_name}"
-    full_path = os.path.join(UPLOAD_DIR, stored_name)
-    file.save(full_path)
+    # Read file into memory so we can (a) count pages and (b) upload to Cloudinary
+    file_bytes = file.read()
 
+    # Auto-detect page count from PDF bytes
     page_count = 0
     try:
-        page_count = len(PdfReader(full_path).pages)
+        import io
+        page_count = len(PdfReader(io.BytesIO(file_bytes)).pages)
     except Exception:
-        # Not fatal — a corrupt/encrypted PDF still gets stored,
-        # admin can fix page_count manually if it matters.
-        pass
+        pass  # not fatal — corrupt/encrypted PDF still gets stored
+
+    # Upload to Cloudinary under the "gmt_learning" folder.
+    # resource_type="raw" is required for PDFs (non-image files).
+    # The returned public_id is what we store — it's permanent and survives restarts.
+    try:
+        upload_result = cloudinary.uploader.upload(
+            file_bytes,
+            folder="gmt_learning",
+            resource_type="raw",
+            use_filename=True,
+            unique_filename=True,
+        )
+        cloudinary_public_id = upload_result["public_id"]
+    except Exception as exc:
+        return jsonify({"error": f"File upload failed: {exc}"}), 502
 
     resource = Resource(
         title=title,
@@ -467,7 +499,7 @@ def admin_create_resource():
         resource_type=resource_type,
         description=description,
         page_count=page_count,
-        file_path=stored_name,
+        file_path=cloudinary_public_id,  # stores Cloudinary public_id, not a local path
         price_kes=price_kes,
         is_active=True,
     )
@@ -529,12 +561,11 @@ def admin_delete_resource(resource_id):
     """
     resource = Resource.query.get_or_404(resource_id)
 
-    file_path = os.path.join(UPLOAD_DIR, resource.file_path)
-    if os.path.exists(file_path):
-        try:
-            os.remove(file_path)
-        except OSError:
-            pass  # don't block deletion of the DB record on a filesystem hiccup
+    # Remove the file from Cloudinary
+    try:
+        cloudinary.uploader.destroy(resource.file_path, resource_type="raw")
+    except Exception:
+        pass  # don't block DB deletion if Cloudinary call fails
 
     db.session.delete(resource)
     db.session.commit()
