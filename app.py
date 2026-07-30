@@ -25,12 +25,15 @@ load_dotenv()  # reads .env in this folder and sets the variables below automati
 
 from flask import (
     Flask, request, jsonify, render_template, abort,
-    send_from_directory, session, redirect, url_for,
+    session, redirect, url_for,
 )
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from intasend import Collect
 from pypdf import PdfReader
+import cloudinary
+import cloudinary.uploader
+import cloudinary.utils
 
 # ---------------------------------------------------------------------------
 # App + config
@@ -61,8 +64,14 @@ INTASEND_SECRET_KEY = os.environ.get("INTASEND_SECRET_KEY", "")
 INTASEND_TEST_MODE = os.environ.get("INTASEND_TEST_MODE", "true").lower() == "true"
 
 RESOURCE_PRICE_KES = 100
-UPLOAD_DIR = os.environ.get("UPLOAD_DIR", os.path.join(os.path.dirname(__file__), "protected_files"))
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# Cloudinary — set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET on Render.
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME", ""),
+    api_key=os.environ.get("CLOUDINARY_API_KEY", ""),
+    api_secret=os.environ.get("CLOUDINARY_API_SECRET", ""),
+    secure=True,
+)
 
 MAX_UPLOAD_MB = 25
 app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_MB * 1024 * 1024
@@ -102,7 +111,7 @@ class Resource(db.Model):
     resource_type = db.Column(db.String(40), nullable=False)  # Past Paper / Notes / Revision / Assessment / Exam
     description = db.Column(db.String(300), default="")
     page_count = db.Column(db.Integer, default=0)
-    file_path = db.Column(db.String(300), nullable=False)    # path inside UPLOAD_DIR, never served directly
+    file_path = db.Column(db.String(300), nullable=False)    # Cloudinary public_id e.g. "gmt_learning/abc123_file.pdf"
     price_kes = db.Column(db.Integer, default=RESOURCE_PRICE_KES)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -173,33 +182,31 @@ Sitemap: https://gmt-learning.onrender.com/sitemap.xml
 
 @app.route("/sitemap.xml")
 def sitemap():
-    """
-    Dynamic sitemap — includes the homepage plus one URL per active resource.
-    Google uses this to discover and rank your pages.
-    """
     base = "https://gmt-learning.onrender.com"
     resources = Resource.query.filter_by(is_active=True).all()
 
-    urls = [
-        f"""  <url>
-    <loc>{base}/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>"""
-    ]
-
+    # One URL per unique level (no duplicates)
+    seen_levels = set()
+    level_urls = []
     for r in resources:
-        urls.append(f"""  <url>
+        if r.level not in seen_levels:
+            seen_levels.add(r.level)
+            level_urls.append(f"""  <url>
     <loc>{base}/?level={r.level.replace(' ', '+')}</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>""")
 
+    urls = [f"""  <url>
+    <loc>{base}/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>"""] + level_urls
+
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 {chr(10).join(urls)}
 </urlset>"""
-
     return xml, 200, {"Content-Type": "application/xml"}
 
 
@@ -369,12 +376,22 @@ def download_resource(order_ref, download_token):
         abort(403)
 
     resource = Resource.query.get_or_404(order.resource_id)
-    return send_from_directory(
-        UPLOAD_DIR,
-        resource.file_path,
-        as_attachment=True,
-        download_name=f"{resource.title}.pdf",
-    )
+
+    # resource.file_path holds the Cloudinary public_id
+    # Use cloudinary_url with sign_url=True — correct approach for raw/PDF files
+    import time
+    try:
+        url, _ = cloudinary.utils.cloudinary_url(
+            resource.file_path,
+            resource_type="raw",
+            sign_url=True,
+            expires_at=int(time.time()) + 300,  # link expires in 5 minutes
+            attachment=True,
+        )
+    except Exception as exc:
+        return jsonify({"error": f"Could not generate download link: {exc}"}), 500
+
+    return redirect(url)
 
 
 # ---------------------------------------------------------------------------
@@ -492,18 +509,35 @@ def admin_create_resource():
     if errors:
         return jsonify({"error": " ".join(errors)}), 400
 
-    safe_name = secure_filename(file.filename)
-    stored_name = f"{uuid.uuid4().hex}_{safe_name}"
-    full_path = os.path.join(UPLOAD_DIR, stored_name)
-    file.save(full_path)
+    # Read file into memory
+    file_bytes = file.read()
 
+    # Auto-detect page count
     page_count = 0
     try:
-        page_count = len(PdfReader(full_path).pages)
+        import io
+        page_count = len(PdfReader(io.BytesIO(file_bytes)).pages)
     except Exception:
-        # Not fatal — a corrupt/encrypted PDF still gets stored,
-        # admin can fix page_count manually if it matters.
         pass
+
+    # Upload to Cloudinary as a base64 data URI.
+    # Using data URI format avoids the resource_type signature mismatch
+    # that affects some SDK versions when passing raw bytes directly.
+    import base64
+    b64 = base64.b64encode(file_bytes).decode("utf-8")
+    data_uri = f"data:application/pdf;base64,{b64}"
+
+    try:
+        safe_name = secure_filename(file.filename)
+        result = cloudinary.uploader.upload(
+            data_uri,
+            folder="gmt_learning",
+            resource_type="raw",
+            public_id=f"{uuid.uuid4().hex}_{safe_name}",
+        )
+        cloudinary_public_id = result["public_id"]
+    except Exception as exc:
+        return jsonify({"error": f"File upload failed: {exc}"}), 502
 
     resource = Resource(
         title=title,
@@ -512,7 +546,7 @@ def admin_create_resource():
         resource_type=resource_type,
         description=description,
         page_count=page_count,
-        file_path=stored_name,
+        file_path=cloudinary_public_id,
         price_kes=price_kes,
         is_active=True,
     )
@@ -574,12 +608,11 @@ def admin_delete_resource(resource_id):
     """
     resource = Resource.query.get_or_404(resource_id)
 
-    file_path = os.path.join(UPLOAD_DIR, resource.file_path)
-    if os.path.exists(file_path):
-        try:
-            os.remove(file_path)
-        except OSError:
-            pass  # don't block deletion of the DB record on a filesystem hiccup
+    # Remove from Cloudinary
+    try:
+        cloudinary.uploader.destroy(resource.file_path, resource_type="raw")
+    except Exception:
+        pass  # don't block DB deletion if Cloudinary call fails
 
     db.session.delete(resource)
     db.session.commit()
