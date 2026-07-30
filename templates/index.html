@@ -3,7 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GMT_Learning — Kenyan CBC & KCSE Resources</title>
+<title>GMT_Learning — CBC & KCSE Past Papers, Notes & Revision Resources Kenya. Live from 6th August</title>
+
+<!-- SEO meta tags — these tell Google exactly what this site is -->
+<meta name="description" content="Download CBC and KCSE past papers, revision notes, assessments and exam papers for PP1 to Form 4 students in Kenya. Pay KSh 100 per resource via M-Pesa. Instant download after payment.">
+<meta name="keywords" content="CBC past papers Kenya, KCSE revision notes, Grade 6 maths past paper, Form 4 notes, Kenya exam papers download, CBC assessment, PP1 PP2 notes, GMT Learning">
+<meta name="author" content="GMT_Learning">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://gmt-learning.onrender.com/">
+
+<!-- Open Graph — controls how your site looks when shared on WhatsApp, Facebook etc -->
+<meta property="og:title" content="GMT_Learning — CBC & KCSE Resources Kenya">
+<meta property="og:description" content="Past papers, revision notes, and assessments for PP1 to Form 4. Pay KSh 100 via M-Pesa, download instantly.">
+<meta property="og:url" content="https://gmt-learning.onrender.com/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_KE">
+
+<!-- Structured data — helps Google show the right rich result -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "GMT_Learning",
+  "description": "Kenyan educational resource marketplace offering CBC and KCSE past papers, notes, revision sets and assessments for PP1 to Form 4 students.",
+  "url": "https://gmt-learning.onrender.com/",
+  "areaServed": "Kenya",
+  "educationalCredentialAwarded": "CBC, KCSE",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  }
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
@@ -62,6 +93,18 @@
   .icon-btn:hover{background:var(--gold-light);transform:translateY(-1px);}
 
   @media (max-width:900px){.nav-links, .search-box{display:none;}}
+
+  /* Mobile search bar — shown only on small screens, sits above the resource grid */
+  .mobile-search{display:none;padding:0 20px 4px;position:relative;z-index:1;}
+  .mobile-search-inner{
+    display:flex;align-items:center;gap:10px;
+    background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:11px 16px;
+  }
+  .mobile-search-inner input{
+    border:none;background:none;outline:none;font-size:0.96rem;width:100%;color:var(--ink);font-family:'Inter',sans-serif;
+  }
+  .mobile-search-inner input::placeholder{color:var(--ink-soft);}
+  @media (max-width:900px){.mobile-search{display:block;}}
 
   .hero{max-width:1200px;margin:0 auto;padding:56px 24px 44px;display:grid;grid-template-columns:1.1fr 0.9fr;gap:48px;align-items:center;position:relative;z-index:1;}
   @media (max-width:900px){.hero{grid-template-columns:1fr;padding:32px 20px 32px;gap:28px;}}
@@ -283,6 +326,13 @@
   </div>
 </section>
 
+<div class="mobile-search" id="mobileSearchBar">
+  <div class="mobile-search-inner">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:var(--ink-soft)"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" id="mobileSearchInput" placeholder="Search by subject, level or title…">
+  </div>
+</div>
+
 <section class="section" id="browse">
   <div class="section-head"><h2 id="browseHeading">All resources</h2></div>
   <div class="grid" id="resourceGrid">
@@ -325,7 +375,7 @@
       <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
       Home
     </a>
-    <a class="dock-item" href="#browse">
+    <a class="dock-item" id="dockBrowse" href="#browse">
       <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
       Browse
     </a>
@@ -505,15 +555,52 @@
     document.getElementById('modalResourceMeta').textContent = `${resource.level} · ${resource.subject}`;
     document.getElementById('priceLabel').textContent = resource.price_kes;
     showState('statePhone');
+    // Prevent page scroll-jump when modal opens on mobile:
+    // save current scroll position, open modal, restore scroll
+    const scrollY = window.scrollY;
     overlay.classList.add('open');
+    window.scrollTo(0, scrollY);
     document.getElementById('phoneInput').value = '';
-    document.getElementById('phoneInput').focus();
+    // Delay focus slightly so iOS doesn't scroll to the input before modal is visible
+    setTimeout(() => document.getElementById('phoneInput').focus(), 80);
   }
 
   function closeCheckout() {
+    const scrollY = window.scrollY;
     overlay.classList.remove('open');
+    window.scrollTo(0, scrollY);
     clearTimeout(pollTimer);
   }
+
+  // Browse dock button: scroll to browse section and focus mobile search
+  document.getElementById('dockBrowse').addEventListener('click', (e) => {
+    e.preventDefault();
+    const browseEl = document.getElementById('browse');
+    const mobileInput = document.getElementById('mobileSearchInput');
+    browseEl.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => mobileInput && mobileInput.focus(), 400);
+  });
+
+  // Mobile search input wired to same filter logic as desktop
+  document.getElementById('mobileSearchInput').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    // Keep desktop search in sync
+    document.getElementById('searchInput').value = e.target.value;
+    const grid = document.getElementById('resourceGrid');
+    if (!q) { renderGrid(); return; }
+    const matches = allResources.filter(r =>
+      r.title.toLowerCase().includes(q) ||
+      r.subject.toLowerCase().includes(q) ||
+      r.level.toLowerCase().includes(q)
+    );
+    document.getElementById('browseHeading').textContent = `Results for "${e.target.value}"`;
+    grid.innerHTML = '';
+    if (matches.length === 0) {
+      grid.innerHTML = '<div class="empty-state">No matching resources found.</div>';
+      return;
+    }
+    matches.forEach(r => grid.appendChild(buildCard(r)));
+  });
 
   function showState(id) {
     ['statePhone', 'statePending', 'statePaid', 'stateFailed'].forEach(s => {
