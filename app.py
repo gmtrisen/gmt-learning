@@ -48,7 +48,7 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")  # set this in your .env â
 # per-process for local dev so it still works without extra setup.
 app.secret_key = os.environ.get("FLASK_SECRET_KEY") or secrets.token_hex(32)
 import hashlib
-   print("BOOT: secret key fingerprint =", hashlib.sha256(app.secret_key.encode()).hexdigest()[:8], flush=True)
+print("BOOT: secret key fingerprint =", hashlib.sha256(app.secret_key.encode()).hexdigest()[:8], flush=True)
 
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60 * 12  # 12 hours
 
