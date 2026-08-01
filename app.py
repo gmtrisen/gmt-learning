@@ -41,16 +41,32 @@ import cloudinary.utils
 
 app = Flask(__name__)
 
+# Render terminates HTTPS at its edge proxy and forwards to this app over
+# plain HTTP internally, adding X-Forwarded-* headers. Without ProxyFix,
+# Flask doesn't know the original request was HTTPS, which can cause
+# subtle cookie / redirect / URL-scheme bugs behind any reverse proxy.
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")  # set this in your .env — required to log into /admin
 
 # Used to sign the admin session cookie. MUST be set to a real random value
 # in production (Render: set as an env var). Falls back to a random value
 # per-process for local dev so it still works without extra setup.
 app.secret_key = os.environ.get("FLASK_SECRET_KEY") or secrets.token_hex(32)
-import hashlib
-print("BOOT: secret key fingerprint =", hashlib.sha256(app.secret_key.encode()).hexdigest()[:8], flush=True)
-
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60 * 12  # 12 hours
+
+# --- Session cookie hardening -----------------------------------------
+# Explicit, unambiguous cookie settings. Leaving these on Flask's defaults
+# is what usually causes "works right after login, breaks minutes later"
+# bugs behind a proxy / custom domain like this site has.
+app.config["SESSION_COOKIE_NAME"] = "gmt_admin_session"
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = True       # site is HTTPS-only on Render
+app.config["SESSION_COOKIE_DOMAIN"] = None       # host-only cookie — don't let it leak across subdomains
+app.config["SESSION_COOKIE_PATH"] = "/"
+app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///gmt_learning.db")
 # Render/Heroku-style Postgres URLs sometimes start with postgres:// — SQLAlchemy needs postgresql://
@@ -718,4 +734,6 @@ with app.app_context():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
 
