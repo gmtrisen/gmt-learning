@@ -98,7 +98,7 @@ ALLOWED_LEVELS = [
     "PP1", "PP2", "Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5",
     "Grade 6", "Grade 7", "Grade 8", "Grade 9", "Grade 10", "Form 3", "Form 4",
 ]
-ALLOWED_TYPES = ["Past Paper", "Notes", "Revision", "Assessment", "Exam"]
+ALLOWED_TYPES = ["Past Paper", "Notes", "Revision", "Assignment", "Exam", "Assessment"]
 
 
 def get_intasend_collect():
