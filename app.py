@@ -202,7 +202,7 @@ Sitemap: https://gmt-learning.onrender.com/sitemap.xml
 
 @app.route("/sitemap.xml")
 def sitemap():
-    base = "https://gmt-learning.onrender.com"
+    base_url = request.url_root.rstrip("/")
     resources = Resource.query.filter_by(is_active=True).all()
 
     # One URL per unique level (no duplicates)
