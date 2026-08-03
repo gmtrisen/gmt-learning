@@ -203,32 +203,36 @@ Sitemap: https://gmt-learning.onrender.com/sitemap.xml
 @app.route("/sitemap.xml")
 def sitemap():
     base_url = "https://gmtlearning.co.ke"
+
     resources = Resource.query.filter_by(is_active=True).all()
 
-    # One URL per unique level (no duplicates)
+    # One URL per unique level
     seen_levels = set()
     level_urls = []
+
     for r in resources:
         if r.level not in seen_levels:
             seen_levels.add(r.level)
-            level_urls.append(f"""  <url>
-    <loc>{base}/?level={r.level.replace(' ', '+')}</loc>
+            level_urls.append(f"""
+  <url>
+    <loc>{base_url}/?level={r.level.replace(' ', '+')}</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>""")
 
-    urls = [f"""  <url>
-    <loc>{base}/</loc>
+    urls = [f"""
+  <url>
+    <loc>{base_url}/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>"""] + level_urls
 
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-{chr(10).join(urls)}
+{''.join(urls)}
 </urlset>"""
-    return xml, 200, {"Content-Type": "application/xml"}
 
+    return Response(xml, mimetype="application/xml")
 
 @app.route("/api/resources")
 def list_resources():
