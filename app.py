@@ -740,18 +740,3 @@ with app.app_context():
 if __name__ == "__main__":
     app.run(debug=True)
 
-@app.route("/sitemap.xml")
-def sitemap():
-    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-    <url>
-        <loc>https://gmtlearning.co.ke/</loc>
-        <changefreq>daily</changefreq>
-        <priority>1.0</priority>
-    </url>
-
-</urlset>
-"""
-    return Response(xml, mimetype="application/xml")
-
