@@ -93,7 +93,7 @@ cloudinary.config(
     secure=True,
 )
 
-MAX_UPLOAD_MB = 25
+MAX_UPLOAD_MB = 50
 app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_MB * 1024 * 1024
 ALLOWED_LEVELS = [
     "PP1", "PP2", "Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5",
