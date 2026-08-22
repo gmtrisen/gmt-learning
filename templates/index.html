@@ -154,6 +154,23 @@
   .section{max-width:1200px;margin:0 auto;padding:36px 24px;position:relative;z-index:1;}
   .section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
   .section-head h2{font-size:1.4rem;color:var(--forest);}
+  /* Site updates — a small running log, edit the .update-item entries by hand */
+.updates-list{display:flex;flex-direction:column;gap:0;}
+.update-item{display:flex;gap:16px;padding:14px 0;border-bottom:1px dashed var(--line);}
+.update-item:last-child{border-bottom:none;}
+.update-date{flex:0 0 auto;width:96px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:600;color:var(--ink-soft);padding-top:2px;}
+.update-body{flex:1;}
+.update-tag{
+  display:inline-block;font-family:'JetBrains Mono',monospace;font-size:0.6rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.04em;background:var(--paper);border:1px solid var(--line);color:var(--forest);
+  padding:2px 8px;border-radius:5px;margin-bottom:6px;
+}
+.update-tag.new{color:var(--stamp);border-color:var(--stamp);}
+.update-body p{font-size:0.88rem;color:var(--ink);line-height:1.45;}
+@media (max-width:560px){
+  .update-item{flex-direction:column;gap:4px;}
+  .update-date{width:auto;}
+}
   .levels-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;}
   .levels-row::-webkit-scrollbar{display:none;}
   .level-chip{
@@ -287,6 +304,7 @@
     <a href="#" class="logo"><span class="badge">GM</span>GMT_Learning</a>
     <nav class="nav-links">
       <a href="#" class="active">Home</a>
+      <a href="#updates">Updates</a>
       <a href="#levels">Levels</a>
       <a href="#browse">Browse</a>
       <a href="#how">How it works</a>
@@ -368,6 +386,26 @@
     <div class="how-card"><div class="how-num">STEP 1</div><h3>Pick a resource</h3><p>Find the exact paper, notes, or revision set you need by level and subject.</p></div>
     <div class="how-card"><div class="how-num">STEP 2</div><h3>Pay KSh 100 on M-Pesa</h3><p>Enter your phone number — you'll get an STK push prompt to approve with your PIN.</p></div>
     <div class="how-card"><div class="how-num">STEP 3</div><h3>Download instantly</h3><p>Once confirmed, your download unlocks right away — no waiting, no codes to type.</p></div>
+  </div>
+</section>
+  <section class="section" id="updates">
+  <div class="section-head"><h2>Site updates</h2></div>
+  <div class="updates-list">
+    <!-- Add a new .update-item block at the TOP of this list whenever you post an update. Copy/paste and edit the date, tag and text. -->
+    <div class="update-item">
+      <div class="update-date">22 Aug 2026</div>
+      <div class="update-body">
+        <span class="update-tag new">New</span>
+        <p>Added a running updates section right here on the homepage.</p>
+      </div>
+    </div>
+    <div class="update-item">
+      <div class="update-date">—</div>
+      <div class="update-body">
+        <span class="update-tag">Note</span>
+        <p>This is where you'll post new resource uploads, pricing changes, or anything else worth telling visitors about.</p>
+      </div>
+    </div>
   </div>
 </section>
 
