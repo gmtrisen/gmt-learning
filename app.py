@@ -70,9 +70,13 @@ app.config["SESSION_COOKIE_PATH"] = "/"
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///gmt_learning.db")
-# Render/Heroku-style Postgres URLs sometimes start with postgres:// — SQLAlchemy needs postgresql://
+# Normalize all Postgres URL variants to use psycopg2 driver explicitly.
+# Railway provides postgresql:// which SQLAlchemy tries to use with psycopg3 (not installed).
+# Forcing postgresql+psycopg2:// makes it use psycopg2-binary which is always available.
 if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg2://", 1)
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -195,14 +199,14 @@ Disallow: /admin
 Disallow: /admin/
 Disallow: /api/download/
 
-Sitemap: https://gmt-learning.onrender.com/sitemap.xml
+Sitemap: https://gmt-learning.up.railway.app/sitemap.xml
 """
     return content, 200, {"Content-Type": "text/plain"}
 
 
 @app.route("/sitemap.xml")
 def sitemap():
-    base_url = "https://gmtlearning.co.ke"
+    base_url = os.environ.get("SITE_URL", "https://gmt-learning.up.railway.app")
 
     resources = Resource.query.filter_by(is_active=True).all()
 
@@ -739,4 +743,3 @@ with app.app_context():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
