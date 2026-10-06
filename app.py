@@ -405,16 +405,19 @@ def download_resource(order_ref, download_token):
 
     resource = Resource.query.get_or_404(order.resource_id)
 
-    # resource.file_path holds the Cloudinary public_id
-    # Use cloudinary_url with sign_url=True — correct approach for raw/PDF files
-    import time
+    # resource.file_path holds the Cloudinary public_id.
+    # private_download_url() goes through api.cloudinary.com (the Admin API)
+    # rather than the public res.cloudinary.com CDN, so it isn't subject to
+    # the account-level "block PDF/ZIP delivery" setting that was causing
+    # the 404 / ERR_INVALID_RESPONSE on the old cloudinary_url() approach.
+    # Access control is already handled above (order.status != "paid" check),
+    # so this link doesn't need its own expiry on top of that.
     try:
-        url, _ = cloudinary.utils.cloudinary_url(
+        url = cloudinary.utils.private_download_url(
             resource.file_path,
+            None,  # extension is already part of the raw public_id
             resource_type="raw",
-            sign_url=True,
-            expires_at=int(time.time()) + 300,  # link expires in 5 minutes
-            attachment=True,
+            type="upload",
         )
     except Exception as exc:
         return jsonify({"error": f"Could not generate download link: {exc}"}), 500
