@@ -420,7 +420,14 @@ def download_resource(order_ref, download_token):
             type="upload",
         )
     except Exception as exc:
+        app.logger.error(f"[download] private_download_url failed for public_id={resource.file_path!r}: {exc}")
         return jsonify({"error": f"Could not generate download link: {exc}"}), 500
+
+    # TEMP DIAGNOSTIC: logs the exact URL this deploy is generating, so we can
+    # confirm in Railway's logs whether this code path is the one actually
+    # running, and see exactly what Cloudinary URL it produces.
+    # Safe to remove once downloads are confirmed working.
+    app.logger.info(f"[download] order={order_ref} public_id={resource.file_path!r} -> {url}")
 
     return redirect(url)
 
@@ -746,3 +753,4 @@ with app.app_context():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
