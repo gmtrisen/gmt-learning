@@ -242,6 +242,88 @@
   .dock-item.center span{color:var(--cream);margin-top:2px;}
   @media (max-width:900px){.sunrise-dock{display:block;}}
 
+  /* ---------- AI help assistant (rule-based, zero-cost) ---------- */
+  .assistant-float{
+    position:fixed;left:20px;bottom:24px;z-index:70;
+    width:56px;height:56px;border-radius:50%;
+    background:var(--forest);display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 20px -4px rgba(0,0,0,0.4);
+    transition:transform 0.15s ease;border:2px solid var(--gold);
+  }
+  .assistant-float:hover{transform:scale(1.06);}
+  .assistant-float svg{width:24px;height:24px;color:var(--gold-light);}
+  .assistant-float .ping{
+    position:absolute;top:-2px;right:-2px;width:13px;height:13px;border-radius:50%;
+    background:var(--stamp);border:2px solid var(--cream);
+  }
+  @media (max-width:900px){
+    .assistant-float{bottom:100px;left:16px;width:50px;height:50px;}
+    .assistant-float svg{width:21px;height:21px;}
+  }
+
+  .assistant-panel{
+    position:fixed;left:20px;bottom:90px;z-index:80;width:360px;max-width:calc(100vw - 40px);
+    max-height:520px;background:#fff;border-radius:16px;box-shadow:0 24px 60px -12px rgba(0,0,0,0.4);
+    display:none;flex-direction:column;overflow:hidden;border:1.5px solid var(--line);
+  }
+  .assistant-panel.open{display:flex;}
+  @media (max-width:900px){
+    .assistant-panel{left:12px;right:12px;bottom:160px;width:auto;max-width:none;max-height:56vh;}
+  }
+
+  .assistant-head{background:var(--forest);color:var(--cream);padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .assistant-head .av{
+    width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.12);
+    display:flex;align-items:center;justify-content:center;border:2px solid var(--gold);flex-shrink:0;
+  }
+  .assistant-head .av svg{width:17px;height:17px;}
+  .assistant-head .meta{flex:1;min-width:0;}
+  .assistant-head .meta .name{font-weight:700;font-size:0.9rem;}
+  .assistant-head .meta .status{font-size:0.7rem;opacity:0.8;display:flex;align-items:center;gap:5px;margin-top:2px;}
+  .assistant-head .meta .status::before{content:"";width:6px;height:6px;border-radius:50%;background:#4ADE80;flex-shrink:0;}
+  .assistant-close{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--cream);opacity:0.85;flex-shrink:0;}
+  .assistant-close:hover{background:rgba(255,255,255,0.14);}
+
+  .assistant-body{flex:1;overflow-y:auto;padding:14px 14px 8px;display:flex;flex-direction:column;gap:10px;background:var(--cream);}
+  .msg{max-width:88%;padding:10px 13px;border-radius:14px;font-size:0.85rem;line-height:1.45;}
+  .msg.bot{background:#fff;border:1.5px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px;color:var(--ink);}
+  .msg.user{background:var(--forest);color:var(--cream);align-self:flex-end;border-bottom-right-radius:4px;}
+  .msg-results{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
+  .msg-res-card{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:9px 11px;
+  }
+  .msg-res-card .info{min-width:0;}
+  .msg-res-card .t{font-size:0.78rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .msg-res-card .m{font-size:0.68rem;color:var(--ink-soft);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+  .msg-res-card button{
+    flex-shrink:0;background:var(--forest);color:var(--cream);font-size:0.72rem;font-weight:700;
+    padding:6px 12px;border-radius:7px;
+  }
+  .assistant-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:4px 14px 12px;background:var(--cream);flex-shrink:0;}
+  .sugg-chip{
+    font-size:0.73rem;font-weight:600;color:var(--forest);background:#fff;border:1.5px solid var(--line);
+    padding:6px 11px;border-radius:20px;transition:border-color .15s;
+  }
+  .sugg-chip:hover{border-color:var(--gold);}
+  .typing-dots{display:flex;gap:4px;padding:3px 2px;}
+  .typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--ink-soft);opacity:0.5;animation:tdot 1s infinite;}
+  .typing-dots span:nth-child(2){animation-delay:0.15s;}
+  .typing-dots span:nth-child(3){animation-delay:0.3s;}
+  @keyframes tdot{0%,60%,100%{opacity:0.3;transform:translateY(0);}30%{opacity:1;transform:translateY(-3px);}}
+
+  .assistant-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1.5px solid var(--line);background:#fff;flex-shrink:0;}
+  .assistant-input-row input{
+    flex:1;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:0.85rem;
+    outline:none;background:var(--paper);color:var(--ink);
+  }
+  .assistant-input-row input:focus{border-color:var(--gold);}
+  .assistant-send{
+    width:40px;height:40px;border-radius:10px;background:var(--forest);color:var(--cream);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .assistant-send:active{transform:scale(0.93);}
+
   .modal-overlay{position:fixed;inset:0;background:rgba(27,30,26,0.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:100;}
   .modal-overlay.open{display:flex;}
   .modal{background:#fff;border-radius:var(--radius);max-width:440px;width:100%;box-shadow:0 24px 60px -12px rgba(0,0,0,0.35);overflow:hidden;max-height:92vh;overflow-y:auto;}
@@ -435,6 +517,35 @@
     <path d="M16.001 3C9.373 3 4 8.373 4 15c0 2.362.687 4.564 1.872 6.417L4 29l7.79-1.833A11.94 11.94 0 0 0 16.001 27C22.63 27 28 21.627 28 15S22.63 3 16.001 3zm0 21.75c-1.983 0-3.828-.575-5.386-1.567l-.386-.244-4.62 1.088 1.117-4.5-.253-.398A9.71 9.71 0 0 1 5.25 15c0-5.936 4.815-10.75 10.751-10.75S26.75 9.064 26.75 15 21.937 24.75 16.001 24.75zm5.895-8.043c-.32-.16-1.897-.936-2.192-1.043-.294-.107-.508-.16-.722.16-.213.32-.827 1.043-1.014 1.257-.187.213-.373.24-.693.08-.32-.16-1.352-.498-2.575-1.588-.952-.849-1.596-1.897-1.783-2.217-.187-.32-.02-.493.14-.652.144-.144.32-.373.48-.56.16-.187.213-.32.32-.533.107-.213.053-.4-.027-.56-.08-.16-.722-1.74-.99-2.383-.26-.626-.526-.54-.722-.55-.187-.008-.4-.01-.613-.01-.213 0-.56.08-.853.4-.294.32-1.12 1.093-1.12 2.667 0 1.573 1.147 3.093 1.307 3.307.16.213 2.257 3.447 5.467 4.833.764.33 1.36.527 1.826.674.767.244 1.466.21 2.018.127.616-.092 1.897-.775 2.164-1.523.267-.747.267-1.387.187-1.523-.08-.135-.293-.213-.613-.373z"/>
   </svg>
 </a>
+
+<button class="assistant-float" id="assistantToggle" aria-label="Chat with GMT_Learning assistant">
+  <span class="ping"></span>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+</button>
+
+<div class="assistant-panel" id="assistantPanel">
+  <div class="assistant-head">
+    <div class="av">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    </div>
+    <div class="meta">
+      <div class="name">GMT_Learning Assistant</div>
+      <div class="status">Online · replies instantly</div>
+    </div>
+    <button class="assistant-close" id="assistantClose" aria-label="Close chat">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="assistant-body" id="assistantBody"></div>
+  <div class="assistant-suggestions" id="assistantSuggestions"></div>
+  <div class="assistant-input-row">
+    <input type="text" id="assistantInput" placeholder="Ask about a level, subject or payment…" autocomplete="off">
+    <button class="assistant-send" id="assistantSend" aria-label="Send message">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+    </button>
+  </div>
+</div>
+
 <nav class="sunrise-dock" aria-label="Mobile navigation">
   <div class="dock-shape">
     <a class="dock-item active" href="#">
@@ -763,6 +874,269 @@
     }
     check();
   }
+
+  // ---------------------------------------------------------------------
+  // Rule-based help assistant — no AI API, zero ongoing cost.
+  // Searches the live allResources catalog + answers common FAQs by
+  // keyword matching. Reuses openCheckout() so "Unlock" buttons inside
+  // chat results behave exactly like the ones on resource cards.
+  // ---------------------------------------------------------------------
+
+  const ASSISTANT_LEVEL_KEYWORDS = [
+    ['pp1', 'PP1'], ['pp2', 'PP2'],
+    ['grade 1', 'Grade 1'], ['grade 2', 'Grade 2'], ['grade 3', 'Grade 3'], ['grade 4', 'Grade 4'],
+    ['grade 5', 'Grade 5'], ['grade 6', 'Grade 6'], ['grade 7', 'Grade 7'], ['grade 8', 'Grade 8'],
+    ['grade 9', 'Grade 9'], ['grade 10', 'Grade 10'],
+    ['form 3', 'Form 3'], ['form 4', 'Form 4'],
+    ['class 1', 'Grade 1'], ['class 2', 'Grade 2'], ['class 3', 'Grade 3'],
+    ['class 4', 'Grade 4'], ['class 5', 'Grade 5'], ['class 6', 'Grade 6'],
+  ];
+  const ASSISTANT_TYPE_KEYWORDS = [
+    ['past papers', 'Past Paper'], ['past paper', 'Past Paper'], ['pastpaper', 'Past Paper'],
+    ['notes', 'Notes'], ['revision', 'Revision'], ['assignment', 'Assignment'],
+    ['exam', 'Exam'], ['assessment', 'Assessment'],
+  ];
+
+  function assistantAddMessage(role, html) {
+    const body = document.getElementById('assistantBody');
+    const div = document.createElement('div');
+    div.className = `msg ${role}`;
+    div.innerHTML = html;
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+    return div;
+  }
+
+  function assistantShowTyping() {
+    const body = document.getElementById('assistantBody');
+    const div = document.createElement('div');
+    div.className = 'msg bot';
+    div.id = 'assistantTyping';
+    div.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function assistantHideTyping() {
+    const el = document.getElementById('assistantTyping');
+    if (el) el.remove();
+  }
+
+  const ASSISTANT_LINK = 'style="color:var(--forest);font-weight:700;text-decoration:underline;"';
+
+  function assistantLevelsSummary() {
+    if (!allResources.length) return '';
+    const counts = {};
+    allResources.forEach(r => { counts[r.level] = (counts[r.level] || 0) + 1; });
+    return Object.keys(counts).map(lvl => `${lvl} (${counts[lvl]})`).join(', ');
+  }
+
+  function assistantLatestUpdate() {
+    const firstP = document.querySelector('.updates-list .update-item .update-body p');
+    return firstP ? firstP.textContent.trim() : null;
+  }
+
+  function buildAssistantResponse(raw) {
+    const q = raw.trim().toLowerCase();
+
+    if (!q) {
+      return { html: "Ask me about a grade, subject, payment, contact details, or how the site works — I'll help." };
+    }
+    if (/\b(hi|hello|hey|niaje|mambo)\b/.test(q)) {
+      return { html: "Hey! 👋 I can help you find resources, explain payment, or answer questions about the site. What do you need?" };
+    }
+    if (/\b(thank|thanks|asante)\b/.test(q)) {
+      return { html: "You're welcome! Anything else you're looking for?" };
+    }
+    if (/\b(what can you do|how can you help|your capabilities)\b/.test(q) || q === 'help') {
+      return { html: "I can help you:<br>• Find past papers, notes or revision sets by level/subject<br>• Explain how payment works<br>• Share contact details<br>• Tell you what's new on the site<br>Just ask in your own words!" };
+    }
+    if (/\b(what is gmt|gmt_learning|gmt learning|about (this|your) site|who are you|what (is|s) this (site|website|page)|what do you sell|what kind of site)\b/.test(q)) {
+      return { html: 'GMT_Learning is a Kenyan marketplace for CBC &amp; KCSE study resources — past papers, notes, revision sets and assessments for PP1 through Form 4. Pick a resource, pay a small fee via M-Pesa, and download instantly.' };
+    }
+    if (/\b(contact|call|phone|number|reach (you|us)|whatsapp|get in touch|human|agent|real person|someone|support team|talk to (someone|a person))\b/.test(q)) {
+      return { html: `You can reach us directly — call or WhatsApp <a href="tel:+254702105515" ${ASSISTANT_LINK}>0702 105515</a>, or <a href="https://wa.me/254702105515" target="_blank" rel="noopener" ${ASSISTANT_LINK}>chat on WhatsApp</a> and we'll respond right away.` };
+    }
+    if (/\b(pay|payment|mpesa|m-pesa|stk)\b/.test(q)) {
+      return { html: "Payment is simple:<br>1. Tap <b>Unlock</b> on a resource<br>2. Enter your M-Pesa number<br>3. Approve the STK push prompt with your PIN<br>Your download unlocks instantly after." };
+    }
+    if (/\b(download|didn.?t receive|missing|not working|can.?t open|cant open|corrupted)\b/.test(q)) {
+      return { html: `If a payment went through but the download isn't working, message us on <a href="https://wa.me/254702105515" target="_blank" rel="noopener" ${ASSISTANT_LINK}>WhatsApp</a> with your phone number and we'll sort it out fast.` };
+    }
+    if (/\b(price|cost|how much|fee)\b/.test(q)) {
+      return { html: 'Most resources are <b>KSh 50–100</b> each — the exact price is shown on every resource card before you pay.' };
+    }
+    if (/\b(refund|money back|wrong (paper|resource|subject|level)|sent (me )?the wrong|mistake|complain|complaint|issue with my (order|payment))\b/.test(q)) {
+      return { html: `Sorry about that! For refunds or an order issue, message us on <a href="https://wa.me/254702105515" target="_blank" rel="noopener" ${ASSISTANT_LINK}>WhatsApp</a> with your order details and we'll sort it out.` };
+    }
+    if (/\b(update|updates|news|what.?s new|latest)\b/.test(q)) {
+      const latest = assistantLatestUpdate();
+      return { html: latest
+        ? `Latest update: "${escapeHtml(latest)}" — see the full list in the <a href="#updates" ${ASSISTANT_LINK}>Updates section</a> below.`
+        : `Check the <a href="#updates" ${ASSISTANT_LINK}>Updates section</a> on the homepage for the latest additions.` };
+    }
+    if (/\b(legit|trust|scam|safe|is this real|genuine)\b/.test(q)) {
+      return { html: `Yes — GMT_Learning is a real, working platform. Payments go through M-Pesa, and downloads unlock automatically the moment payment is confirmed. If anything ever goes wrong, reach us on <a href="https://wa.me/254702105515" target="_blank" rel="noopener" ${ASSISTANT_LINK}>WhatsApp</a>.` };
+    }
+    if (/\b(how (does|do) (this|it|the site) work|how to (use|navigate|browse|search)|navigate (this|the) (site|website))\b/.test(q)) {
+      return { html: 'Easy — tap a level under "Browse by level", or search by subject/title at the top. Tap <b>Unlock</b> on any resource, pay via M-Pesa, and your download unlocks instantly. You can always ask me too!' };
+    }
+    if (/\b(level|levels|grades?)\b/.test(q) && !ASSISTANT_LEVEL_KEYWORDS.some(([kw]) => q.includes(kw))) {
+      const summary = assistantLevelsSummary();
+      return { html: `We cover <b>PP1, PP2, Grade 1–10, and Form 3–4</b>.${summary ? ' Right now we have resources for: ' + summary + '.' : ''} Tell me which one and I'll show what's available.` };
+    }
+
+    // ---- Resource search ----
+    let matchedLevel = null;
+    for (const [kw, level] of ASSISTANT_LEVEL_KEYWORDS) {
+      if (q.includes(kw)) { matchedLevel = level; break; }
+    }
+    let matchedType = null;
+    for (const [kw, type] of ASSISTANT_TYPE_KEYWORDS) {
+      if (q.includes(kw)) { matchedType = type; break; }
+    }
+    const words = q.replace(/[^\w\s]/g, '').split(/\s+/).filter(w => w.length > 2);
+
+    if (matchedLevel || matchedType) {
+      let candidates = allResources.filter(r => {
+        const levelOk = matchedLevel ? r.level === matchedLevel : true;
+        const typeOk = matchedType ? r.resource_type === matchedType : true;
+        return levelOk && typeOk;
+      });
+
+      if (words.length && candidates.length) {
+        const narrowed = candidates.filter(r => {
+          const hay = `${r.title} ${r.subject}`.toLowerCase();
+          return words.some(w => hay.includes(w));
+        });
+        if (narrowed.length) candidates = narrowed;
+      }
+
+      if (candidates.length === 0) {
+        const summary = assistantLevelsSummary();
+        const levelTxt = matchedLevel || 'that';
+        return { html: `We don't have any ${levelTxt}${matchedType ? ' ' + matchedType.toLowerCase() : ''} resources listed yet.${summary ? ' Right now we have: ' + summary + '.' : ''} Want to browse everything instead, or <a href="https://wa.me/254702105515" target="_blank" rel="noopener" ${ASSISTANT_LINK}>ask us on WhatsApp</a>?` };
+      }
+
+      const label = `${matchedLevel || ''}${matchedType ? ' ' + matchedType.toLowerCase() : ''}`.trim();
+      return {
+        html: `Found ${candidates.length} ${label} resource${candidates.length === 1 ? '' : 's'} — here you go:`,
+        results: candidates,
+      };
+    }
+
+    // No level/type keyword — try free-text match against everything
+    if (words.length) {
+      const freeMatches = allResources.filter(r => {
+        const hay = `${r.title} ${r.subject} ${r.level} ${r.resource_type}`.toLowerCase();
+        return words.some(w => hay.includes(w));
+      });
+      if (freeMatches.length) {
+        return {
+          html: `Found ${freeMatches.length} matching resource${freeMatches.length === 1 ? '' : 's'}:`,
+          results: freeMatches,
+        };
+      }
+    }
+
+    const summary = assistantLevelsSummary();
+    return {
+      html: `I couldn't find anything for that.${summary ? ' We currently have resources for: ' + summary + '.' : ''} Try naming a level (e.g. "Form 4") or subject, use the search bar above, or <a href="https://wa.me/254702105515" target="_blank" rel="noopener" ${ASSISTANT_LINK}>ask us on WhatsApp</a>.`,
+    };
+  }
+
+  function assistantReply(userText) {
+    assistantShowTyping();
+    setTimeout(() => {
+      assistantHideTyping();
+      const { html, results } = buildAssistantResponse(userText);
+      const msgEl = assistantAddMessage('bot', html);
+      if (results && results.length) {
+        const wrap = document.createElement('div');
+        wrap.className = 'msg-results';
+        results.slice(0, 4).forEach(r => {
+          const card = document.createElement('div');
+          card.className = 'msg-res-card';
+          card.innerHTML = `
+            <div class="info">
+              <div class="t">${escapeHtml(r.title)}</div>
+              <div class="m">${escapeHtml(r.level)} · KSh ${r.price_kes}</div>
+            </div>
+            <button type="button">Unlock</button>
+          `;
+          card.querySelector('button').addEventListener('click', () => {
+            document.getElementById('assistantPanel').classList.remove('open');
+            openCheckout(r);
+          });
+          wrap.appendChild(card);
+        });
+        msgEl.appendChild(wrap);
+      }
+      const body = document.getElementById('assistantBody');
+      body.scrollTop = body.scrollHeight;
+    }, 450 + Math.random() * 350);
+  }
+
+  function assistantSend() {
+    const input = document.getElementById('assistantInput');
+    const text = input.value.trim();
+    if (!text) return;
+    assistantAddMessage('user', escapeHtml(text));
+    input.value = '';
+    assistantReply(text);
+  }
+
+  function assistantRenderSuggestions(list) {
+    const wrap = document.getElementById('assistantSuggestions');
+    wrap.innerHTML = '';
+    list.forEach(s => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'sugg-chip';
+      chip.textContent = s;
+      chip.addEventListener('click', () => {
+        document.getElementById('assistantInput').value = s;
+        assistantSend();
+      });
+      wrap.appendChild(chip);
+    });
+  }
+
+  function assistantSuggestionList() {
+    const base = ['How do I pay?', 'What levels do you have?', 'Contact us'];
+    if (allResources.length) {
+      const levels = [...new Set(allResources.map(r => r.level))];
+      if (levels.length) base[1] = `${levels[0]} resources`;
+    }
+    return base;
+  }
+
+  let assistantStarted = false;
+  function assistantOpen() {
+    document.getElementById('assistantPanel').classList.add('open');
+    if (!assistantStarted) {
+      assistantStarted = true;
+      assistantAddMessage('bot', "Hi, I'm the GMT_Learning assistant 👋<br>Ask me to find a resource, explain payment, share contact details, or anything else about the site.");
+      assistantRenderSuggestions(assistantSuggestionList());
+    }
+    setTimeout(() => document.getElementById('assistantInput').focus(), 100);
+  }
+
+  document.getElementById('assistantToggle').addEventListener('click', () => {
+    const panel = document.getElementById('assistantPanel');
+    if (panel.classList.contains('open')) {
+      panel.classList.remove('open');
+    } else {
+      assistantOpen();
+    }
+  });
+  document.getElementById('assistantClose').addEventListener('click', () => {
+    document.getElementById('assistantPanel').classList.remove('open');
+  });
+  document.getElementById('assistantSend').addEventListener('click', assistantSend);
+  document.getElementById('assistantInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') assistantSend();
+  });
 
   loadResources();
 </script>
