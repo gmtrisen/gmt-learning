@@ -199,14 +199,14 @@ Disallow: /admin
 Disallow: /admin/
 Disallow: /api/download/
 
-Sitemap: https://gmt-learning.up.railway.app/sitemap.xml
+Sitemap: https://gmtlearning.co.ke/sitemap.xml
 """
     return content, 200, {"Content-Type": "text/plain"}
 
 
 @app.route("/sitemap.xml")
 def sitemap():
-    base_url = os.environ.get("SITE_URL", "https://gmt-learning.up.railway.app")
+    base_url = os.environ.get("SITE_URL", "https://gmtlearning.co.ke")
 
     resources = Resource.query.filter_by(is_active=True).all()
 
