@@ -52,9 +52,26 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")  # set this in your .env — required to log into /admin
 
 # Used to sign the admin session cookie. MUST be set to a real random value
-# in production (Render: set as an env var). Falls back to a random value
-# per-process for local dev so it still works without extra setup.
-app.secret_key = os.environ.get("FLASK_SECRET_KEY") or secrets.token_hex(32)
+# in production (Railway: set FLASK_SECRET_KEY as an env var). Falls back to
+# a random value per-process for local dev so it still works without extra
+# setup — but in production that fallback is a trap: if the platform runs
+# multiple workers, or restarts the process (deploy, scaling, idle sleep),
+# each process gets its OWN random key, so a session cookie signed by one
+# worker fails verification on another. That shows up as random "Not
+# authenticated" / 401 errors on /admin while logged in, with no clear
+# trigger. Logging loudly here means it shows up in Railway's deploy logs
+# immediately instead of being debugged later as a mystery auth bug.
+_FLASK_SECRET_KEY_ENV = os.environ.get("FLASK_SECRET_KEY")
+if not _FLASK_SECRET_KEY_ENV:
+    app.logger.warning(
+        "FLASK_SECRET_KEY is not set — using a random per-process secret key. "
+        "Admin sessions WILL randomly log you out (401 'Not authenticated') "
+        "whenever the app restarts or a request lands on a different worker. "
+        "Fix: set FLASK_SECRET_KEY as a permanent environment variable in "
+        "Railway (Variables tab), e.g. generate one with: "
+        "python3 -c \"import secrets; print(secrets.token_hex(32))\""
+    )
+app.secret_key = _FLASK_SECRET_KEY_ENV or secrets.token_hex(32)
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60 * 12  # 12 hours
 
 # --- Session cookie hardening -----------------------------------------
@@ -753,4 +770,5 @@ with app.app_context():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
